@@ -6,6 +6,8 @@ import "./Collection.sol";
 contract CollectionFactory {
     mapping(address => address[]) public createdCollections;
 
+    event CollectionCreated(address _address, address user);
+
     function createCollection(
         string calldata name,
         string calldata symbol,
@@ -25,6 +27,7 @@ contract CollectionFactory {
         collection.transferOwnership(msg.sender);
         address collectionAddress = address(collection);
         createdCollections[msg.sender].push(collectionAddress);
+        emit CollectionCreated(collectionAddress, msg.sender);
     }
 
     function getUserCollections(address user)
@@ -33,15 +36,5 @@ contract CollectionFactory {
         returns (address[] memory collections)
     {
         collections = createdCollections[user];
-    }
-
-    function getLastCollection(address user)
-        external
-        view
-        returns (address collection)
-    {
-        address[] memory collections = createdCollections[user];
-        require(collections.length > 0, "No collections");
-        collection = collections[collections.length - 1];
     }
 }

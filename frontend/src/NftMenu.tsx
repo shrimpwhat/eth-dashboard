@@ -37,9 +37,10 @@ export default function NftMintPage() {
       data.price,
       data.uri
     );
-    await tx.wait();
-    console.log("Tx hash: " + tx.hash);
-    return await contract.getLastCollection(address);
+    const txReceipt = await tx.wait();
+    console.log("Tx hash: " + txReceipt.transactionHash);
+    if (txReceipt.events) return txReceipt.events[2].args?._address;
+    else throw new Error("No events have been emitted");
   };
 
   const getCollectionData = () => {
@@ -65,7 +66,7 @@ export default function NftMintPage() {
 
   return (
     <div className="text-xl">
-      <Title text="Create NFT" />
+      <Title text="Mint NFT" />
       <FindContract url="/nft/collection/" />
       <hr />
       <div className="mt-12 mb-8 flex justify-center gap-6 flex-wrap">

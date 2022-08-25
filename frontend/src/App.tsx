@@ -1,4 +1,3 @@
-import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Wallet from "./Wallet";
@@ -20,7 +19,7 @@ function IndexPage() {
                   <Link to="/">Home</Link>
                 </li>
                 <li>
-                  <Link to="/nft">Create NFT</Link>
+                  <Link to="/nft">Mint NFT</Link>
                 </li>
                 <li className="my-5">
                   <Link to="">NFT staking</Link>
