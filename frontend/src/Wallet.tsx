@@ -7,9 +7,6 @@ export default function Wallet() {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork({
     chainId: 5,
-    onError() {
-      switchNetwork && switchNetwork(5);
-    },
   });
 
   useEffect(() => {

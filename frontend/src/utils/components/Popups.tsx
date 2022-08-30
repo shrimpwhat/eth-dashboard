@@ -55,3 +55,46 @@ export const deployedCollectionAlert = (fn: Promise<any>) => {
     }
   );
 };
+
+export const TransactionAlert = (fn: Promise<any>) => {
+  toast.promise(
+    fn,
+    {
+      pending: "Waiting for transaction...",
+      success: {
+        render({ data }) {
+          return (
+            <div>
+              <p>Nft successfuly minted! Check it at Opensea:</p>
+              <ul>
+                {data.events.map((event: any, index: number) => (
+                  <li key={index}>
+                    <a
+                      target="_blank"
+                      href={`https://testnets.opensea.io/assets/goerli/${data.to}/${event.args.tokenId}`}
+                      className="text-blue-600 underline"
+                    >
+                      Link
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        },
+      },
+      error: {
+        render({ data }) {
+          return data.message;
+        },
+      },
+    },
+    {
+      position: "top-right",
+      hideProgressBar: true,
+      closeOnClick: false,
+      autoClose: false,
+      draggable: true,
+    }
+  );
+};
