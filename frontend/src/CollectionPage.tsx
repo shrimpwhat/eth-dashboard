@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { useContract, useSigner, useAccount } from "wagmi";
+import { useContract, useSigner, useAccount, useProvider } from "wagmi";
 import Title from "./utils/components/Title";
 import Collection from "./utils/abi/collection.json";
 import ConnectButton from "./utils/components/ConnectButton";
-import { TransactionAlert } from "./utils/components/Popups";
+import { NftMintAlert, WithdrawalAlert } from "./utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 
 interface CollectionInfo {
@@ -14,11 +14,14 @@ interface CollectionInfo {
   maxSupply: number;
   totalMinted: number;
   userMintedAmount: number;
+  owner: string;
+  contractBalance: string;
 }
 
 export default function CollectionPage() {
   const { address } = useAccount();
   const { address: contractAddress } = useParams();
+  const provider = useProvider({ chainId: 5 });
   const { data: signer } = useSigner();
   const contract: ethers.Contract = useContract({
     addressOrName: contractAddress as string,
@@ -34,6 +37,8 @@ export default function CollectionPage() {
     maxSupply: 0,
     totalMinted: 0,
     userMintedAmount: 0,
+    owner: "",
+    contractBalance: "0",
   });
   const [isFetched, setFetchStatus] = useState(false);
 
@@ -46,6 +51,10 @@ export default function CollectionPage() {
         const totalMinted = Number(await contract.totalMinted());
         const maxSupply = Number(await contract.MAX_SUPPLY());
         const userMintedAmount = Number(await contract.numberMinted(address));
+        const owner = await contract.owner();
+        const contractBalance = ethers.utils.formatEther(
+          await provider.getBalance(contractAddress as string)
+        );
         updateInfo({
           name,
           price,
@@ -53,19 +62,25 @@ export default function CollectionPage() {
           totalMinted,
           maxSupply,
           userMintedAmount,
+          owner,
+          contractBalance,
         });
         setFetchStatus(true);
       }
     })();
-  }, [signer, contract]);
+  }, [contract, signer]);
 
   const updateInfoAfterMint = async () => {
     const totalMinted = Number(await contract.totalMinted());
     const userMintedAmount = Number(await contract.numberMinted(address));
+    const contractBalance = ethers.utils.formatEther(
+      await provider.getBalance(contractAddress as string)
+    );
     updateInfo({
       ...collectionInfo,
       totalMinted,
       userMintedAmount,
+      contractBalance,
     });
   };
 
@@ -77,6 +92,20 @@ export default function CollectionPage() {
     console.log(receipt.transactionHash);
     updateInfoAfterMint();
     return receipt;
+  };
+
+  const withdraw = async () => {
+    const tx = await contract.withdraw();
+    const receipt = await tx.wait();
+    console.log(receipt.transactionHash);
+    const contractBalance = ethers.utils.formatEther(
+      await provider.getBalance(contractAddress as string)
+    );
+    updateInfo({
+      ...collectionInfo,
+      contractBalance,
+    });
+    return receipt.transactionHash;
   };
 
   return (
@@ -102,7 +131,7 @@ export default function CollectionPage() {
                   className="mt-4"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    TransactionAlert(mint());
+                    NftMintAlert(mint());
                   }}
                 >
                   <label htmlFor="mint-amount" className="mr-3 text-xl">
@@ -145,6 +174,25 @@ export default function CollectionPage() {
               <p className="text-center text-2xl my-3">
                 You have already minted max amount
               </p>
+            )}
+            {collectionInfo.owner === address && (
+              <div>
+                <h1>
+                  Contract balance is{" "}
+                  <span className="font-bold">
+                    {collectionInfo.contractBalance}
+                  </span>{" "}
+                  ETH
+                </h1>
+                <button
+                  className="block mx-auto my-5 text-lg border border-black rounded px-3 py-1 duration-500 hover:bg-black hover:text-white"
+                  onClick={() => {
+                    WithdrawalAlert(withdraw());
+                  }}
+                >
+                  Withdraw
+                </button>
+              </div>
             )}
           </div>
         </div>

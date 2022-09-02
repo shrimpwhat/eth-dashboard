@@ -42,7 +42,7 @@ export const deployedCollectionAlert = (fn: Promise<any>) => {
       },
       error: {
         render({ data }) {
-          return data.message;
+          return <p className="break-all">{data.message}</p>;
         },
       },
     },
@@ -56,7 +56,7 @@ export const deployedCollectionAlert = (fn: Promise<any>) => {
   );
 };
 
-export const TransactionAlert = (fn: Promise<any>) => {
+export const NftMintAlert = (fn: Promise<any>) => {
   toast.promise(
     fn,
     {
@@ -71,6 +71,7 @@ export const TransactionAlert = (fn: Promise<any>) => {
                   <li key={index}>
                     <a
                       target="_blank"
+                      rel="noreferrer"
                       href={`https://testnets.opensea.io/assets/goerli/${data.to}/${event.args.tokenId}`}
                       className="text-blue-600 underline"
                     >
@@ -85,7 +86,46 @@ export const TransactionAlert = (fn: Promise<any>) => {
       },
       error: {
         render({ data }) {
-          return data.message;
+          return <p className="break-all">{data.message}</p>;
+        },
+      },
+    },
+    {
+      position: "top-right",
+      hideProgressBar: true,
+      closeOnClick: false,
+      autoClose: false,
+      draggable: true,
+    }
+  );
+};
+
+export const WithdrawalAlert = (fn: Promise<any>) => {
+  toast.promise(
+    fn,
+    {
+      pending: "Waiting for transaction...",
+      success: {
+        render({ data }) {
+          return (
+            <div>
+              <p>Funds successfuly withdrawn!</p>
+
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://goerli.etherscan.io/tx/${data}`}
+                className="text-blue-600 underline"
+              >
+                Etherscan link
+              </a>
+            </div>
+          );
+        },
+      },
+      error: {
+        render({ data }) {
+          return <p className="break-all">{data.message}</p>;
         },
       },
     },
