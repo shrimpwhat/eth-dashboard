@@ -52,6 +52,6 @@ contract Collection is ERC721A, Ownable {
         );
         require(msg.value >= TOKEN_PRICE * amount, "Not enough ETH sent");
         require(_totalMinted() + amount <= MAX_SUPPLY, "Reached max supply");
-        _mint(msg.sender, amount);
+        _safeMint(msg.sender, amount);
     }
 }

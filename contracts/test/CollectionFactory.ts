@@ -13,7 +13,7 @@ describe("ERC721 Factory", () => {
   it("Should create a collection and mint a nft", async () => {
     const factory = await loadFixture(getFactory);
     const [signer] = await hre.ethers.getSigners();
-    await factory.createCollection(
+    const tx = await factory.createCollection(
       "Any name",
       "TEST",
       2,
@@ -21,7 +21,9 @@ describe("ERC721 Factory", () => {
       "100000000000000",
       "ipfs://abcdefg"
     );
-    const collectionAddress = await factory.getLastCollection(signer.address);
+    const receipt = await tx.wait();
+    let collectionAddress;
+    if (receipt.events) collectionAddress = receipt.events[2].args?._address;
     expect(await factory.createdCollections(signer.address, 0)).eq(
       collectionAddress
     );
