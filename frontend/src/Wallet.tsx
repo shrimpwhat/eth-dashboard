@@ -1,22 +1,18 @@
 import { useEffect } from "react";
+import { ConnectButton, useAccountModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useSwitchNetwork, useNetwork } from "wagmi";
-import ConnectButton from "./utils/components/ConnectButton";
 
 export default function Wallet() {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork({
-    chainId: 5,
-  });
+  const { switchNetwork, isLoading } = useSwitchNetwork();
 
   useEffect(() => {
-    if (chain?.id !== 5 && switchNetwork) {
-      switchNetwork(5);
-    }
-  }, [chain]);
+    if (chain?.id !== 5 && switchNetwork && isConnected) switchNetwork(5);
+  }, [chain?.id, isLoading]);
 
   const style =
-    "mb-10 border rounded border-black w-max p-2 hover:bg-white duration-500";
+    "border rounded border-black w-max p-2 hover:bg-white duration-500 cursor-pointer";
 
   const shortAddress = () => {
     if (address) {
@@ -24,13 +20,17 @@ export default function Wallet() {
     }
   };
 
+  const { openAccountModal } = useAccountModal();
+
   return (
-    <>
+    <div className="mb-6">
       {!isConnected ? (
-        <ConnectButton style="hover:bg-white hover:text-black" />
+        <ConnectButton />
       ) : (
-        <p className={style}>{shortAddress()}</p>
+        <p className={style} onClick={openAccountModal}>
+          {shortAddress()}
+        </p>
       )}
-    </>
+    </div>
   );
 }

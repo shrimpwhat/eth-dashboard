@@ -1,8 +1,9 @@
 import Title from "./utils/components/Title";
 import Input from "./utils/components/Input";
-import ConnectButton from "./utils/components/ConnectButton";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import FindContract from "./utils/components/FindContract";
-import CollectionFactory from "./utils/abi/factory.json";
+import CollectionFactoryInterface from "./utils/abi/factory.json";
+import NftMinterInterface from "./utils/abi/single.json";
 import { useSigner, useContract, useAccount } from "wagmi";
 import { FormEvent, useState } from "react";
 import { errorAlert, deployedCollectionAlert } from "./utils/components/Popups";
@@ -37,17 +38,17 @@ export default function NftMintPage() {
           Create collection
         </button>
       </div>
-      <div>{activeButton === 1 ? null : <CreateCollection />}</div>
+      <div>{activeButton === 1 ? <MintSingleNft /> : <CreateCollection />}</div>
     </div>
   );
 }
 
 const CreateCollection = () => {
-  const { address } = useAccount();
+  const { isConnected } = useAccount();
   const { data: signer } = useSigner();
-  const contract: ethers.Contract = useContract({
+  const { contract } = useContract({
     addressOrName: process.env.REACT_APP_NFT_FACTORY_ADDRESS ?? "",
-    contractInterface: CollectionFactory.abi,
+    contractInterface: CollectionFactoryInterface.abi,
     signerOrProvider: signer,
   });
 
@@ -59,7 +60,7 @@ const CreateCollection = () => {
   const createCollection = async () => {
     const data = getCollectionData();
     if (data.uri[data.uri.length - 1] !== "/") data.uri += "/";
-    const tx: ethers.ContractTransaction = await contract.createCollection(
+    const tx: ethers.ContractTransaction = await contract?.createCollection(
       data.name,
       data.symbol,
       data.limit,
@@ -89,7 +90,7 @@ const CreateCollection = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (address) {
+    if (isConnected) {
       deployedCollectionAlert(createCollection());
     } else errorAlert("Connect your wallet first!", "wallet-connect");
   };
@@ -115,7 +116,7 @@ const CreateCollection = () => {
             required
           />
           <div className="mx-auto">
-            {signer ? (
+            {isConnected ? (
               <button
                 type="submit"
                 className={
@@ -135,9 +136,69 @@ const CreateCollection = () => {
 };
 
 const MintSingleNft = () => {
+  const { isConnected } = useAccount();
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    addressOrName: process.env.REACT_APP_MINTER_ADDRESS ?? "",
+    contractInterface: NftMinterInterface.abi,
+    signerOrProvider: signer,
+  });
+
+  const upload = async () => {
+    const reader = new FileReader();
+    const image = (
+      document.getElementById("nft_img") as HTMLInputElement
+    ).files?.item(0);
+    if (image) {
+      reader.readAsArrayBuffer(image);
+      reader.onloadend = async () => {
+        const res = await fetch(
+          "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              file: reader?.result?.toString(),
+              cidVersion: 1,
+            }),
+            headers: {
+              Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
+            },
+          }
+        );
+        console.log(await res.json());
+      };
+    } else errorAlert("No files added!", "no-files");
+  };
+
   return (
-    <form>
-      <div className="flex gap-x-1 flex-wrap justify-between max-w-max mx-auto"></div>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        upload();
+      }}
+    >
+      <div className="max-w-max mx-auto">
+        <Input text="Name" id="nft_name" className="w-full" />
+        <Input text="Description" id="nft_description" className="w-full" />
+        <Input text="Image" type="file" id="nft_img" />
+        {isConnected ? (
+          <div className="text-center">
+            <button
+              className={
+                nonActive + "duration-500 hover:bg-black hover:text-white"
+              }
+            >
+              Submit
+            </button>
+          </div>
+        ) : (
+          <div className="flex">
+            <div className="mx-auto">
+              <ConnectButton />
+            </div>
+          </div>
+        )}
+      </div>
     </form>
   );
 };

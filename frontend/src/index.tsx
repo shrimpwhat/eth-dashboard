@@ -2,24 +2,35 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import { configureChains, chain, WagmiConfig, createClient } from "wagmi";
+import "@rainbow-me/rainbowkit/styles.css";
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+  lightTheme,
+} from "@rainbow-me/rainbowkit";
+import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { publicProvider } from "wagmi/providers/public";
 
-const { provider, webSocketProvider } = configureChains(
+const { chains, provider } = configureChains(
   [chain.goerli],
   [
     jsonRpcProvider({
-      rpc: () => ({
-        http: process.env.REACT_APP_RPC_URL ?? "",
-      }),
+      rpc: () => ({ http: process.env.REACT_APP_RPC_URL as string }),
     }),
+    publicProvider(),
   ]
 );
 
-const client = createClient({
+const { connectors } = getDefaultWallets({
+  appName: "Ethereum Dashboard",
+  chains,
+});
+
+const wagmiClient = createClient({
   autoConnect: true,
+  connectors,
   provider,
-  webSocketProvider,
 });
 
 const root = ReactDOM.createRoot(
@@ -28,8 +39,10 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <WagmiConfig client={client}>
-      <App />
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains}>
+        <App />
+      </RainbowKitProvider>
     </WagmiConfig>
   </React.StrictMode>
 );

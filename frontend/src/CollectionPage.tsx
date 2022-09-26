@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useContract, useSigner, useAccount, useProvider } from "wagmi";
 import Title from "./utils/components/Title";
 import Collection from "./utils/abi/collection.json";
-import ConnectButton from "./utils/components/ConnectButton";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NftMintAlert, WithdrawalAlert } from "./utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 
@@ -19,7 +19,7 @@ interface CollectionInfo {
 }
 
 export default function CollectionPage() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { address: contractAddress } = useParams();
   const provider = useProvider({ chainId: 5 });
   const { data: signer } = useSigner();
@@ -111,7 +111,7 @@ export default function CollectionPage() {
   return (
     <div>
       <Title text="Nft minting page" />
-      {isFetched ? (
+      {isFetched && isConnected ? (
         <div className="mx-auto md:w-[500px] lg:w-[700px] border border-black text-center p-2 mt-8">
           <h2 className="text-3xl mt-3">{collectionInfo.name}</h2>
           <p className="mt-4 text-xl">
@@ -199,7 +199,11 @@ export default function CollectionPage() {
       ) : (
         <>
           {!address ? (
-            <ConnectButton style="mx-auto" />
+            <div className="flex">
+              <div className="mx-auto">
+                <ConnectButton />
+              </div>
+            </div>
           ) : (
             <p className="text-center text-2xl">Fetching data...</p>
           )}

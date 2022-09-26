@@ -5,6 +5,7 @@ import Title from "./utils/components/Title";
 import NftMintPage from "./NftMenu";
 import { ToastContainer } from "react-toastify";
 import CollectionPage from "./CollectionPage";
+import { useEffect } from "react";
 
 function IndexPage() {
   return (
