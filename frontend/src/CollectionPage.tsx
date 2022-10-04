@@ -4,7 +4,7 @@ import { useContract, useSigner, useAccount, useProvider } from "wagmi";
 import Title from "./utils/components/Title";
 import Collection from "./utils/abi/collection.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { NftMintAlert, WithdrawalAlert } from "./utils/components/Popups";
+import { nftMintAlert, WithdrawalAlert } from "./utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 
 interface CollectionInfo {
@@ -131,7 +131,7 @@ export default function CollectionPage() {
                   className="mt-4"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    NftMintAlert(mint());
+                    nftMintAlert(mint());
                   }}
                 >
                   <label htmlFor="mint-amount" className="mr-3 text-xl">

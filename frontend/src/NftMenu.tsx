@@ -6,7 +6,11 @@ import CollectionFactoryInterface from "./utils/abi/factory.json";
 import NftMinterInterface from "./utils/abi/single.json";
 import { useSigner, useContract, useAccount } from "wagmi";
 import { FormEvent, useState } from "react";
-import { errorAlert, deployedCollectionAlert } from "./utils/components/Popups";
+import {
+  errorAlert,
+  deployedCollectionAlert,
+  nftMintAlert,
+} from "./utils/components/Popups";
 import { ethers } from "ethers";
 
 const nonActive = "border rounded border-black p-3 ";
@@ -69,7 +73,7 @@ const CreateCollection = () => {
       data.uri
     );
     const txReceipt = await tx.wait();
-    console.log("Tx hash: " + txReceipt.transactionHash);
+    console.log("Tx hash:", txReceipt.transactionHash);
     if (txReceipt.events) return txReceipt.events[2].args?._address;
     else throw new Error("No events have been emitted");
   };
@@ -144,37 +148,74 @@ const MintSingleNft = () => {
     signerOrProvider: signer,
   });
 
-  const upload = async () => {
-    const reader = new FileReader();
+  const uploadImage = async (): Promise<string | undefined> => {
+    const formData = new FormData();
     const image = (
       document.getElementById("nft_img") as HTMLInputElement
     ).files?.item(0);
     if (image) {
-      reader.readAsArrayBuffer(image);
-      reader.onloadend = async () => {
-        const res = await fetch(
-          "https://api.pinata.cloud/pinning/pinFileToIPFS",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              file: reader?.result?.toString(),
-              cidVersion: 1,
-            }),
-            headers: {
-              Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
-            },
-          }
-        );
-        console.log(await res.json());
-      };
-    } else errorAlert("No files added!", "no-files");
+      formData.append("file", image);
+      const response = await fetch(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
+          },
+        }
+      );
+      const { IpfsHash } = await response.json();
+      return IpfsHash;
+    } else {
+      throw new Error("No files added!");
+    }
+  };
+
+  const uploadMetadata = async (imageHash: string): Promise<string> => {
+    const name = (document.getElementById("nft_name") as HTMLInputElement)
+      .value;
+    const description = (
+      document.getElementById("nft_description") as HTMLInputElement
+    ).value;
+    const data = JSON.stringify({
+      pinataContent: {
+        name,
+        description,
+        image: "ipfs://" + imageHash,
+      },
+    });
+    const response = await fetch(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      {
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const { IpfsHash } = await response.json();
+    return IpfsHash;
+  };
+
+  const mint = async () => {
+    const image = await uploadImage();
+    if (image) {
+      const metdata = await uploadMetadata(image);
+      const tx = await contract.mint("ipfs://" + metdata);
+      const receipt = await tx.wait();
+      console.log("Tx hash:", receipt.transactionHash);
+      return receipt;
+    } else Promise.reject("");
   };
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        upload();
+        nftMintAlert(mint());
       }}
     >
       <div className="max-w-max mx-auto">

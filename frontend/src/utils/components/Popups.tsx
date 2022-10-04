@@ -56,7 +56,7 @@ export const deployedCollectionAlert = (fn: Promise<any>) => {
   );
 };
 
-export const NftMintAlert = (fn: Promise<any>) => {
+export const nftMintAlert = (fn: Promise<any>) => {
   toast.promise(
     fn,
     {
@@ -67,12 +67,12 @@ export const NftMintAlert = (fn: Promise<any>) => {
             <div>
               <p>Nft successfuly minted! Check it at Opensea:</p>
               <ul>
-                {data.events.map((event: any, index: number) => (
+                {data?.events?.map((event: any, index: number) => (
                   <li key={index}>
                     <a
                       target="_blank"
                       rel="noreferrer"
-                      href={`https://testnets.opensea.io/assets/goerli/${data.to}/${event.args.tokenId}`}
+                      href={`https://testnets.opensea.io/assets/goerli/${data?.to}/${event?.args?.tokenId}`}
                       className="text-blue-600 underline"
                     >
                       Link
