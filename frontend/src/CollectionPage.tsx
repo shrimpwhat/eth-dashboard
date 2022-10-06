@@ -115,8 +115,12 @@ export default function CollectionPage() {
         <div className="mx-auto md:w-[500px] lg:w-[700px] border border-black text-center p-2 mt-8">
           <h2 className="text-3xl mt-3">{collectionInfo.name}</h2>
           <p className="mt-4 text-xl">
-            {collectionInfo.maxSupply - collectionInfo.totalMinted}/
-            {collectionInfo.maxSupply} Available
+            <span className="text-purple-600">
+              {collectionInfo.maxSupply - collectionInfo.totalMinted}
+            </span>
+            /
+            <span className="text-fuchsia-900">{collectionInfo.maxSupply}</span>{" "}
+            Available
           </p>
           <p className="mt-4 text-xl">
             <strong>
@@ -129,7 +133,9 @@ export default function CollectionPage() {
               <>
                 <p className="mt-4 text-xl">
                   You can mint{" "}
-                  {collectionInfo.userLimit - collectionInfo.userMintedAmount}{" "}
+                  <span className="text-rose-800">
+                    {collectionInfo.userLimit - collectionInfo.userMintedAmount}
+                  </span>{" "}
                   more nfts
                 </p>
                 <form
