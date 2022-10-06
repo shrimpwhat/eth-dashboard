@@ -23,8 +23,9 @@ describe("ERC721 Factory", () => {
     );
     const receipt = await tx.wait();
     let collectionAddress;
-    if (receipt.events) collectionAddress = receipt.events[2].args?._address;
-    expect(await factory.createdCollections(signer.address, 0)).eq(
+    if (receipt.events)
+      collectionAddress = receipt.events[2].args?.collectionAddress;
+    expect((await factory.getUserCollections(signer.address))[0]).eq(
       collectionAddress
     );
     expect(collectionAddress).is.not.undefined;

@@ -2,10 +2,10 @@ import Title from "./utils/components/Title";
 import Input from "./utils/components/Input";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import FindContract from "./utils/components/FindContract";
-import CollectionFactoryInterface from "./utils/abi/factory.json";
-import NftMinterInterface from "./utils/abi/single.json";
+import CollectionFactoryInterface from "./utils/abi/CollectionFactory.json";
+import NftMinterInterface from "./utils/abi/NftMinter.json";
 import { useSigner, useContract, useAccount } from "wagmi";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import {
   errorAlert,
   deployedCollectionAlert,
@@ -50,9 +50,9 @@ export default function NftMintPage() {
 const CreateCollection = () => {
   const { isConnected } = useAccount();
   const { data: signer } = useSigner();
-  const { contract } = useContract({
+  const contract = useContract({
     addressOrName: process.env.REACT_APP_NFT_FACTORY_ADDRESS ?? "",
-    contractInterface: CollectionFactoryInterface.abi,
+    contractInterface: CollectionFactoryInterface,
     signerOrProvider: signer,
   });
 
@@ -74,7 +74,7 @@ const CreateCollection = () => {
     );
     const txReceipt = await tx.wait();
     console.log("Tx hash:", txReceipt.transactionHash);
-    if (txReceipt.events) return txReceipt.events[2].args?._address;
+    if (txReceipt.events) return txReceipt.events[2].args?.collectionAddress;
     else throw new Error("No events have been emitted");
   };
 
@@ -143,8 +143,8 @@ const MintSingleNft = () => {
   const { isConnected } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
-    addressOrName: process.env.REACT_APP_MINTER_ADDRESS ?? "",
-    contractInterface: NftMinterInterface.abi,
+    addressOrName: process.env.REACT_APP_NFT_MINTER_ADDRESS ?? "",
+    contractInterface: NftMinterInterface,
     signerOrProvider: signer,
   });
 

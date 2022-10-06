@@ -4,15 +4,15 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./Collection.sol";
 
 contract CollectionFactory {
-    mapping(address => address[]) public createdCollections;
+    mapping(address => address[]) createdCollections;
 
-    event CollectionCreated(address _address, address user);
+    event CollectionCreated(address collectionAddress, address creatorAddress);
 
     function createCollection(
         string calldata name,
         string calldata symbol,
-        uint16 maxUserLimit,
-        uint16 maxSupply,
+        uint32 maxUserLimit,
+        uint32 maxSupply,
         uint256 tokenPrice,
         string calldata baseMetdataURI
     ) external payable {

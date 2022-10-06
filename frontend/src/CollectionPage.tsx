@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useContract, useSigner, useAccount, useProvider } from "wagmi";
 import Title from "./utils/components/Title";
-import Collection from "./utils/abi/collection.json";
+import Collection from "./utils/abi/Collection.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { nftMintAlert, WithdrawalAlert } from "./utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
@@ -25,7 +25,7 @@ export default function CollectionPage() {
   const { data: signer } = useSigner();
   const contract: ethers.Contract = useContract({
     addressOrName: contractAddress as string,
-    contractInterface: Collection.abi,
+    contractInterface: Collection,
     signerOrProvider: signer,
   });
   const mintAmount = useRef(1);
@@ -118,7 +118,12 @@ export default function CollectionPage() {
             {collectionInfo.maxSupply - collectionInfo.totalMinted}/
             {collectionInfo.maxSupply} Available
           </p>
-
+          <p className="mt-4 text-xl">
+            <strong>
+              {ethers.utils.formatEther(collectionInfo.price)} ETH
+            </strong>{" "}
+            per token
+          </p>
           <div className="text-center">
             {collectionInfo.userMintedAmount < collectionInfo.userLimit ? (
               <>
@@ -171,7 +176,7 @@ export default function CollectionPage() {
                 </form>
               </>
             ) : (
-              <p className="text-center text-2xl my-3">
+              <p className="text-center text-2xl my-4">
                 You have already minted max amount
               </p>
             )}

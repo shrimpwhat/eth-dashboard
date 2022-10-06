@@ -8,7 +8,7 @@ async function main() {
     1,
     5,
     1000000000000,
-    "ipfs://dfgd"
+    "ipfs://test"
   );
   await contract.deployed();
   console.log(contract.address);
