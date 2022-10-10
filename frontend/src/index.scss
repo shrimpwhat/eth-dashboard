@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 @font-face {
   font-family: "Roboto Slab";
@@ -17,4 +17,8 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.submit-button {
+  @apply border rounded border-black p-3 duration-500 hover:bg-black hover:text-white;
 }

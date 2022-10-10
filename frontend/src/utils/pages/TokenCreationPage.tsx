@@ -44,7 +44,11 @@ export default function TokenCreationPage() {
             type="number"
             min={0}
           />
-          {isConnected ? <button>Submit</button> : <ConnectButton />}
+          {isConnected ? (
+            <button className="submit-button">Submit</button>
+          ) : (
+            <ConnectButton />
+          )}
         </div>
       </form>
     </div>

@@ -121,12 +121,7 @@ const CreateCollection = () => {
           />
           <div className="mx-auto">
             {isConnected ? (
-              <button
-                type="submit"
-                className={
-                  nonActive + "duration-500 hover:bg-black hover:text-white"
-                }
-              >
+              <button type="submit" className="submit-button">
                 Submit
               </button>
             ) : (
@@ -208,7 +203,7 @@ const MintSingleNft = () => {
       const receipt = await tx.wait();
       console.log("Tx hash:", receipt.transactionHash);
       return receipt;
-    } else Promise.reject("");
+    }
   };
 
   return (
@@ -224,13 +219,7 @@ const MintSingleNft = () => {
         <Input text="Image" type="file" id="nft_img" />
         {isConnected ? (
           <div className="text-center">
-            <button
-              className={
-                nonActive + "duration-500 hover:bg-black hover:text-white"
-              }
-            >
-              Submit
-            </button>
+            <button className="submit-button">Submit</button>
           </div>
         ) : (
           <div className="flex">
