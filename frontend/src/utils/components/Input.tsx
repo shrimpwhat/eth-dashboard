@@ -3,10 +3,14 @@ export default function Input({
   id,
   type,
   className,
+  min,
+  max,
 }: {
   text: string;
   id: string;
   type?: string | undefined;
+  min?: number;
+  max?: number;
   className?: string;
 }) {
   const label = "block";
@@ -16,7 +20,14 @@ export default function Input({
       <label htmlFor={id} className={label}>
         {text}
       </label>
-      <input className={input} id={id} type={type} required />
+      <input
+        className={input}
+        id={id}
+        type={type}
+        min={min}
+        max={max}
+        required
+      />
     </div>
   );
 }

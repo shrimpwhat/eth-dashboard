@@ -1,10 +1,11 @@
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Wallet from "./Wallet";
+import Wallet from "./utils/components/Wallet";
 import Title from "./utils/components/Title";
-import NftMintPage from "./NftMenu";
+import NftMintPage from "./utils/pages/NftMenu";
 import { ToastContainer } from "react-toastify";
-import CollectionPage from "./CollectionPage";
+import CollectionPage from "./utils/pages/CollectionPage";
+import TokenCreationPage from "./utils/pages/TokenCreationPage";
 
 function IndexPage() {
   return (
@@ -25,7 +26,7 @@ function IndexPage() {
                   <Link to="">NFT staking</Link>
                 </li>
                 <li>
-                  <Link to="">Create token</Link>
+                  <Link to="/token/create">Create token</Link>
                 </li>
                 <li className="my-5">
                   <Link to="">Swap</Link>
@@ -48,6 +49,9 @@ function IndexPage() {
                   path="collection/:address"
                   element={<CollectionPage />}
                 />
+              </Route>
+              <Route path="token">
+                <Route path="create" element={<TokenCreationPage />} />
               </Route>
             </Routes>
           </div>

@@ -1,16 +1,16 @@
-import Title from "./utils/components/Title";
-import Input from "./utils/components/Input";
+import Title from "../components/Title";
+import Input from "../components/Input";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import FindContract from "./utils/components/FindContract";
-import CollectionFactoryInterface from "./utils/abi/CollectionFactory.json";
-import NftMinterInterface from "./utils/abi/NftMinter.json";
+import FindContract from "../components/FindContract";
+import CollectionFactoryInterface from "../abi/CollectionFactory.json";
+import NftMinterInterface from "../abi/NftMinter.json";
 import { useSigner, useContract, useAccount } from "wagmi";
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState } from "react";
 import {
   errorAlert,
   deployedCollectionAlert,
   nftMintAlert,
-} from "./utils/components/Popups";
+} from "../components/Popups";
 import { ethers } from "ethers";
 
 const nonActive = "border rounded border-black p-3 ";
