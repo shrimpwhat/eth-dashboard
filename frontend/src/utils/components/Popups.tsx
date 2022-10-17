@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { ReactNode } from "react";
 
 export const errorAlert = (msg: string, id: string) => {
   toast.error(msg, {
@@ -13,31 +14,17 @@ export const errorAlert = (msg: string, id: string) => {
   });
 };
 
-export const deployedCollectionAlert = (fn: Promise<any>) => {
+const deployedContract = (
+  fn: Promise<any>,
+  renderFn: (data: any) => ReactNode
+) => {
   toast.promise(
     fn,
     {
       pending: "Waiting for transaction...",
       success: {
         render({ data }) {
-          return (
-            <div>
-              <p>
-                Collection deployed at address:
-                <br />
-                <span className="text-xs break-all text-black">{data}</span>
-                <br />
-                Go{" "}
-                <Link
-                  to={"/nft/collection/" + data}
-                  className="text-blue-600 underline"
-                >
-                  here
-                </Link>{" "}
-                to mint some nfts
-              </p>
-            </div>
-          );
+          return renderFn(data);
         },
       },
       error: {
@@ -54,6 +41,47 @@ export const deployedCollectionAlert = (fn: Promise<any>) => {
       draggable: false,
     }
   );
+};
+export const deployedCollectionAlert = (fn: Promise<any>) => {
+  deployedContract(fn, (data: any) => (
+    <div>
+      <p>
+        Collection deployed at address:
+        <br />
+        <span className="text-xs break-all text-black">{data}</span>
+        <br />
+        Go{" "}
+        <Link
+          to={"/nft/collection/" + data}
+          className="text-blue-600 underline"
+        >
+          here
+        </Link>{" "}
+        to mint some nfts
+      </p>
+    </div>
+  ));
+};
+
+export const deployedTokenAlert = (fn: Promise<any>) => {
+  deployedContract(fn, (data: any) => (
+    <div>
+      <p>
+        Token deployed at address:
+        <br />
+        <span className="text-xs break-all text-black">{data}</span>
+        <br />
+        Go{" "}
+        <Link
+          to={"/nft/collection/" + data}
+          className="text-blue-600 underline"
+        >
+          here
+        </Link>{" "}
+        to mint some nfts
+      </p>
+    </div>
+  ));
 };
 
 export const nftMintAlert = (fn: Promise<any>) => {
@@ -131,9 +159,9 @@ export const WithdrawalAlert = (fn: Promise<any>) => {
     },
     {
       position: "top-right",
-      hideProgressBar: true,
-      closeOnClick: false,
-      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: true,
+      autoClose: 10000,
       draggable: true,
     }
   );

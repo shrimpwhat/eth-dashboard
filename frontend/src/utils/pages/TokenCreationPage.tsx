@@ -4,12 +4,13 @@ import { useAccount, useContract, useSigner } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TokenFactoryAbi from "../abi/TokenFactory.json";
 import { FormEvent } from "react";
+import { ethers } from "ethers";
 
 export default function TokenCreationPage() {
   const { isConnected } = useAccount();
   const { data: signer } = useSigner();
 
-  const contract = useContract({
+  const contract: ethers.Contract = useContract({
     addressOrName: process.env.REACT_APP_TOKEN_FACTORY ?? "",
     contractInterface: TokenFactoryAbi,
     signerOrProvider: signer,
@@ -28,7 +29,13 @@ export default function TokenCreationPage() {
   const createToken = async (e: FormEvent) => {
     e.preventDefault();
     const { name, symbol, supply } = getTokenData();
-    const tx = await contract.createToken(name, symbol, supply);
+    const tx: ethers.ContractTransaction = await contract.createToken(
+      name,
+      symbol,
+      supply
+    );
+    const receipt = await tx.wait();
+    return receipt;
   };
 
   return (
