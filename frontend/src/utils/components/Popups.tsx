@@ -70,15 +70,9 @@ export const deployedTokenAlert = (fn: Promise<any>) => {
         Token deployed at address:
         <br />
         <span className="text-xs break-all text-black">{data}</span>
-        <br />
-        Go{" "}
-        <Link
-          to={"/nft/collection/" + data}
-          className="text-blue-600 underline"
-        >
-          here
-        </Link>{" "}
-        to mint some nfts
+        <Link to={"/token/" + data} className="text-blue-600 underline">
+          Token Page
+        </Link>
       </p>
     </div>
   ));

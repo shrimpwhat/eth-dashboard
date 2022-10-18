@@ -5,6 +5,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TokenFactoryAbi from "../abi/TokenFactory.json";
 import { FormEvent } from "react";
 import { ethers } from "ethers";
+import { deployedTokenAlert } from "../components/Popups";
 
 export default function TokenCreationPage() {
   const { isConnected } = useAccount();
@@ -26,16 +27,17 @@ export default function TokenCreationPage() {
     return { name, symbol, supply };
   };
 
-  const createToken = async (e: FormEvent) => {
-    e.preventDefault();
+  const createToken = async () => {
     const { name, symbol, supply } = getTokenData();
     const tx: ethers.ContractTransaction = await contract.createToken(
       name,
       symbol,
-      supply
+      ethers.utils.parseEther(supply)
     );
     const receipt = await tx.wait();
-    return receipt;
+    console.log(tx.hash);
+    const tokenAddress = receipt.events?.at(3)?.args?.tokenAddress;
+    return tokenAddress;
   };
 
   return (
@@ -46,13 +48,21 @@ export default function TokenCreationPage() {
           <Input text="Name" id="token-name" />
           <Input text="Symbol" id="token-symbol" />
           <Input
-            text="Initial supply(decs=18)"
+            text="Initial supply"
             id="token-supply"
             type="number"
             min={0}
           />
           {isConnected ? (
-            <button className="submit-button">Submit</button>
+            <button
+              className="submit-button"
+              onClick={(e: FormEvent) => {
+                e.preventDefault();
+                deployedTokenAlert(createToken());
+              }}
+            >
+              Create
+            </button>
           ) : (
             <ConnectButton />
           )}

@@ -122,7 +122,7 @@ const CreateCollection = () => {
           <div className="mx-auto">
             {isConnected ? (
               <button type="submit" className="submit-button">
-                Submit
+                Create
               </button>
             ) : (
               <ConnectButton />
@@ -219,7 +219,7 @@ const MintSingleNft = () => {
         <Input text="Image" type="file" id="nft_img" />
         {isConnected ? (
           <div className="text-center">
-            <button className="submit-button">Submit</button>
+            <button className="submit-button">Create</button>
           </div>
         ) : (
           <div className="flex">
