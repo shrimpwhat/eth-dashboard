@@ -26,13 +26,10 @@ function IndexPage() {
                   <Link to="">NFT staking</Link>
                 </li>
                 <li>
-                  <Link to="/token/create">Create token</Link>
+                  <Link to="/token/create">ERC20</Link>
                 </li>
                 <li className="my-5">
                   <Link to="">Swap</Link>
-                </li>
-                <li>
-                  <Link to="">Token staking</Link>
                 </li>
               </ul>
             </nav>

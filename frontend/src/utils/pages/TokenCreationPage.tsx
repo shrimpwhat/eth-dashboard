@@ -1,5 +1,6 @@
 import Title from "../components/Title";
 import Input from "../components/Input";
+import FindContract from "../components/FindContract";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TokenFactoryAbi from "../abi/TokenFactory.json";
@@ -43,31 +44,35 @@ export default function TokenCreationPage() {
   return (
     <div>
       <Title text="Create Token" />
-      <form>
-        <div className="flex text-xl flex-col items-center">
-          <Input text="Name" id="token-name" />
-          <Input text="Symbol" id="token-symbol" />
-          <Input
-            text="Initial supply"
-            id="token-supply"
-            type="number"
-            min={0}
-          />
-          {isConnected ? (
-            <button
-              className="submit-button"
-              onClick={(e: FormEvent) => {
-                e.preventDefault();
-                deployedTokenAlert(createToken());
-              }}
-            >
-              Create
-            </button>
-          ) : (
-            <ConnectButton />
-          )}
-        </div>
-      </form>
+      <div className="text-xl">
+        <FindContract url="/token/" text={"Token address"} />
+        <form>
+          <div className="flex flex-col items-center w-1/3 mx-auto">
+            <Input text="Name" id="token-name" className="w-full" />
+            <Input text="Symbol" id="token-symbol" className="w-full" />
+            <Input
+              text="Initial supply"
+              id="token-supply"
+              type="number"
+              min={0}
+              className="w-full"
+            />
+            {isConnected ? (
+              <button
+                className="submit-button"
+                onClick={(e: FormEvent) => {
+                  e.preventDefault();
+                  deployedTokenAlert(createToken());
+                }}
+              >
+                Create
+              </button>
+            ) : (
+              <ConnectButton />
+            )}
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

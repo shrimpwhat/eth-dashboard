@@ -22,9 +22,8 @@ export default function NftMintPage() {
   return (
     <div className="text-xl">
       <Title text="Mint NFT" />
-      <FindContract url="/nft/collection/" />
-      <hr />
-      <div className="mt-12 mb-8 flex justify-center gap-6 flex-wrap">
+      <FindContract url="/nft/collection/" text={"Collection address"} />
+      <div className="mb-8 flex justify-center gap-6 flex-wrap">
         <button
           className={activeButton === 1 ? active : nonActive}
           onClick={() => {
