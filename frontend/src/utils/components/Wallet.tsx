@@ -24,13 +24,7 @@ export default function Wallet() {
 
   return (
     <div className="mb-6">
-      {!isConnected ? (
-        <ConnectButton />
-      ) : (
-        <p className={style} onClick={openAccountModal}>
-          {shortAddress()}
-        </p>
-      )}
+      <ConnectButton />
     </div>
   );
 }
