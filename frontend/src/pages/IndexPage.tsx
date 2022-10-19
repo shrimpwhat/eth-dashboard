@@ -1,4 +1,4 @@
-import Title from "../components/Title";
+import Title from "../utils/components/Title";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 

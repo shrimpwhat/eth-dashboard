@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Wallet from "./utils/components/Wallet";
-import IndexPage from "./utils/pages/IndexPage";
-import NftMintPage from "./utils/pages/NftMenu";
+import IndexPage from "./pages/IndexPage";
+import NftMintPage from "./pages/NftMenu";
 import { ToastContainer } from "react-toastify";
-import CollectionPage from "./utils/pages/CollectionPage";
-import TokenCreationPage from "./utils/pages/TokenCreationPage";
+import CollectionPage from "./pages/CollectionPage";
+import TokenCreationPage from "./pages/TokenCreationPage";
 
 function App() {
   return (

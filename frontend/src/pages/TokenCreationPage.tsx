@@ -1,12 +1,12 @@
-import Title from "../components/Title";
-import Input from "../components/Input";
-import FindContract from "../components/FindContract";
+import Title from "../utils/components/Title";
+import Input from "../utils/components/Input";
+import FindContract from "../utils/components/FindContract";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import TokenFactoryAbi from "../abi/TokenFactory.json";
+import TokenFactoryAbi from "../utils/abi/TokenFactory.json";
 import { FormEvent } from "react";
 import { ethers } from "ethers";
-import { deployedTokenAlert } from "../components/Popups";
+import { deployedTokenAlert } from "../utils/components/Popups";
 
 export default function TokenCreationPage() {
   const { isConnected } = useAccount();

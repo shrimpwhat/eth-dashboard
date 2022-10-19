@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useContract, useSigner, useAccount, useProvider } from "wagmi";
-import Title from "../components/Title";
-import Collection from "../abi/ERC721.json";
+import Title from "../utils/components/Title";
+import Collection from "../utils/abi/ERC721.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { nftMintAlert, WithdrawalAlert } from "../components/Popups";
+import { nftMintAlert, WithdrawalAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 
 interface CollectionInfo {
