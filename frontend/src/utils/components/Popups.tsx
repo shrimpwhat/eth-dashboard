@@ -70,6 +70,7 @@ export const deployedTokenAlert = (fn: Promise<any>) => {
         Token deployed at address:
         <br />
         <span className="text-xs break-all text-black">{data}</span>
+        <br />
         <Link to={"/token/" + data} className="text-blue-600 underline">
           Token Page
         </Link>

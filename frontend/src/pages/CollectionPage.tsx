@@ -112,7 +112,7 @@ export default function CollectionPage() {
     <div>
       <Title text="Nft minting page" />
       {isFetched && isConnected ? (
-        <div className="mx-auto md:w-[500px] lg:w-[700px] border border-black text-center p-2 mt-8">
+        <div className="card">
           <h2 className="text-3xl mt-3">{collectionInfo.name}</h2>
           <p className="mt-4 text-xl">
             <span className="text-purple-600">
@@ -216,12 +216,10 @@ export default function CollectionPage() {
               </div>
             </div>
           ) : (
-            <p className="text-center text-2xl">Fetching data...</p>
+            <p className="text-center text-2xl font-bold">Fetching data...</p>
           )}
         </>
       )}
     </div>
   );
 }
-
-//0x8572e9B939bC603D93b44e7B883f4fF5ec4c0a5f

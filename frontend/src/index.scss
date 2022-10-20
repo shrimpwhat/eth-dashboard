@@ -22,3 +22,7 @@ code {
 .submit-button {
   @apply border rounded border-black p-3 duration-500 hover:bg-black hover:text-white;
 }
+
+.card {
+  @apply mx-auto md:w-[500px] lg:w-[700px] border border-black text-center p-2 mt-8;
+}

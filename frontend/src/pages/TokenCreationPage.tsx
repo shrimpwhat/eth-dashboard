@@ -46,7 +46,12 @@ export default function TokenCreationPage() {
       <Title text="Create Token" />
       <div className="text-xl">
         <FindContract url="/token/" text={"Token address"} />
-        <form>
+        <form
+          onSubmit={(e: FormEvent) => {
+            e.preventDefault();
+            deployedTokenAlert(createToken());
+          }}
+        >
           <div className="flex flex-col items-center w-1/3 mx-auto">
             <Input text="Name" id="token-name" className="w-full" />
             <Input text="Symbol" id="token-symbol" className="w-full" />
@@ -58,15 +63,7 @@ export default function TokenCreationPage() {
               className="w-full"
             />
             {isConnected ? (
-              <button
-                className="submit-button"
-                onClick={(e: FormEvent) => {
-                  e.preventDefault();
-                  deployedTokenAlert(createToken());
-                }}
-              >
-                Create
-              </button>
+              <button className="submit-button">Create</button>
             ) : (
               <ConnectButton />
             )}
