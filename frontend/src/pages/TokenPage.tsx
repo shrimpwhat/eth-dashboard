@@ -69,12 +69,13 @@ export default function TokenPage() {
     )
       errorAlert("Insufficient balance", "invalid-transfer-amount");
     else {
-      TransferAlert(
-        transferTokens(
-          transferAddress.current,
-          ethers.utils.parseEther(transferAmount.current)
-        )
-      );
+      console.log(transferAmount.current);
+      // TransferAlert(
+      //   transferTokens(
+      //     transferAddress.current,
+      //     ethers.utils.parseEther(transferAmount.current)
+      //   )
+      // );
     }
   };
 
@@ -116,7 +117,7 @@ export default function TokenPage() {
                 transferAddress.current = e.target.value;
               }}
             />
-            <div>
+            <div className="flex flex-row items-end gap-3">
               <Input
                 text="Transfer amount"
                 id="transfer-amount"
@@ -128,6 +129,21 @@ export default function TokenPage() {
                   transferAmount.current = e.target.value;
                 }}
               />
+              <button
+                className="mb-2 text-blue-500 underline text-lg"
+                onClick={() => {
+                  const input = document.getElementById(
+                    "transfer-amount"
+                  ) as HTMLInputElement;
+                  const balance = ethers.utils.formatEther(
+                    data?.at(2)?.toString() as string
+                  );
+                  transferAmount.current = balance;
+                  input.value = balance;
+                }}
+              >
+                Max
+              </button>
             </div>
             <button className="submit-button">Transfer</button>
           </form>
