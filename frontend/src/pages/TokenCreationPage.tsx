@@ -53,14 +53,15 @@ export default function TokenCreationPage() {
           }}
         >
           <div className="flex flex-col items-center w-1/3 mx-auto">
-            <Input text="Name" id="token-name" className="w-full" />
-            <Input text="Symbol" id="token-symbol" className="w-full" />
+            <Input text="Name" id="token-name" className="mb-8" />
+            <Input text="Symbol" id="token-symbol" className="mb-8" />
             <Input
               text="Initial supply"
               id="token-supply"
               type="number"
               min={0}
-              className="w-full"
+              step={1e-18}
+              className="mb-8"
             />
             {isConnected ? (
               <button className="submit-button">Create</button>

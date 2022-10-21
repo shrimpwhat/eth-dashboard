@@ -1,3 +1,5 @@
+import { ChangeEventHandler } from "react";
+
 export default function Input({
   text,
   id,
@@ -5,18 +7,22 @@ export default function Input({
   className,
   min,
   max,
+  step,
+  onChange,
 }: {
   text: string;
   id: string;
   type?: string | undefined;
   min?: number;
   max?: number;
+  step?: number;
   className?: string;
+  onChange?: ChangeEventHandler;
 }) {
   const label = "block";
-  const input = "border border-black mb-8 p-1 " + className;
+  const input = "border border-black p-1 " + className;
   return (
-    <div className={className}>
+    <div>
       <label htmlFor={id} className={label}>
         {text}
       </label>
@@ -26,7 +32,9 @@ export default function Input({
         type={type}
         min={min}
         max={max}
+        step={step}
         required
+        onChange={onChange}
       />
     </div>
   );
