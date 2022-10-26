@@ -18,7 +18,7 @@ const Index = () => {
           <li>Create your own ERC-20 token</li>
           <li>Create a farming contract for your token</li>
           <li>
-            Provide a liquidity to your tokenы and make them available for swaps
+            Provide a liquidity to your tokens and make them available for swaps
           </li>
         </ul>
         <h2>Connect wallet and start creating!</h2>

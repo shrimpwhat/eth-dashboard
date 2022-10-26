@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Wallet from "./utils/components/Wallet";
 import IndexPage from "./pages/IndexPage";
 import NftMintPage from "./pages/NftMenu";
 import { ToastContainer } from "react-toastify";
 import CollectionPage from "./pages/CollectionPage";
 import TokenPage from "./pages/TokenPage";
 import TokenCreationPage from "./pages/TokenCreationPage";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 function App() {
   return (
@@ -13,7 +13,9 @@ function App() {
       <header></header>
       <main className="flex h-screen relative">
         <div className="bg-purple-200 w-40 fixed h-full md:w-60 p-5">
-          <Wallet />
+          <div className="mb-6">
+            <ConnectButton />
+          </div>
           <nav>
             <ul className="list-none">
               <li className="mb-5">

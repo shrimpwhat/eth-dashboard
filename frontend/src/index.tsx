@@ -6,15 +6,13 @@ import "@rainbow-me/rainbowkit/styles.css";
 import "react-toastify/dist/ReactToastify.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { infuraProvider } from "wagmi/providers/infura";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, provider } = configureChains(
   [chain.goerli],
   [
-    jsonRpcProvider({
-      rpc: () => ({ http: process.env.REACT_APP_RPC_URL as string }),
-    }),
+    infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY }),
     publicProvider(),
   ]
 );
@@ -37,7 +35,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
+      <RainbowKitProvider
+        chains={chains}
+        initialChain={chain.goerli}
+        showRecentTransactions={true}
+      >
         <App />
       </RainbowKitProvider>
     </WagmiConfig>

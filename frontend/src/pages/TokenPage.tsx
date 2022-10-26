@@ -69,13 +69,12 @@ export default function TokenPage() {
     )
       errorAlert("Insufficient balance", "invalid-transfer-amount");
     else {
-      console.log(transferAmount.current);
-      // TransferAlert(
-      //   transferTokens(
-      //     transferAddress.current,
-      //     ethers.utils.parseEther(transferAmount.current)
-      //   )
-      // );
+      TransferAlert(
+        transferTokens(
+          transferAddress.current,
+          ethers.utils.parseEther(transferAmount.current)
+        )
+      );
     }
   };
 
@@ -131,6 +130,7 @@ export default function TokenPage() {
               />
               <button
                 className="mb-2 text-blue-500 underline text-lg"
+                type="button"
                 onClick={() => {
                   const input = document.getElementById(
                     "transfer-amount"
