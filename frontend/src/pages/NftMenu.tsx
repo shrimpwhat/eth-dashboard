@@ -12,6 +12,7 @@ import {
   nftMintAlert,
 } from "../utils/components/Popups";
 import { ethers } from "ethers";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 const nonActive = "border rounded border-black p-3 ";
 const active = nonActive + "bg-purple-200";
@@ -54,6 +55,7 @@ const CreateCollection = () => {
     contractInterface: CollectionFactoryInterface,
     signerOrProvider: signer,
   });
+  const addRecentTransaction = useAddRecentTransaction();
 
   const getInputValue = (id: string) => {
     const input = document.getElementById(id) as HTMLInputElement;
@@ -71,8 +73,11 @@ const CreateCollection = () => {
       data.price,
       data.uri
     );
+    addRecentTransaction({
+      hash: tx.hash,
+      description: `Create collection ${data.name}`,
+    });
     const txReceipt = await tx.wait();
-    console.log("Tx hash:", txReceipt.transactionHash);
     if (txReceipt.events) return txReceipt.events[2].args?.collectionAddress;
     else throw new Error("No events have been emitted");
   };
@@ -155,6 +160,7 @@ const MintSingleNft = () => {
     contractInterface: NftMinterInterface,
     signerOrProvider: signer,
   });
+  const addRecentTransaction = useAddRecentTransaction();
 
   const uploadImage = async (): Promise<string | undefined> => {
     const formData = new FormData();
@@ -213,8 +219,11 @@ const MintSingleNft = () => {
     if (image) {
       const metdata = await uploadMetadata(image);
       const tx = await contract.mint("ipfs://" + metdata);
+      addRecentTransaction({
+        hash: tx.hash,
+        description: "Mint single nft",
+      });
       const receipt = await tx.wait();
-      console.log("Tx hash:", receipt.transactionHash);
       return receipt;
     }
   };

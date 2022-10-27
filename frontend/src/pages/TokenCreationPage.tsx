@@ -7,10 +7,12 @@ import TokenFactoryAbi from "../utils/abi/TokenFactory.json";
 import { FormEvent } from "react";
 import { ethers } from "ethers";
 import { deployedTokenAlert } from "../utils/components/Popups";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 export default function TokenCreationPage() {
   const { isConnected } = useAccount();
   const { data: signer } = useSigner();
+  const addRecentTransaction = useAddRecentTransaction();
 
   const contract: ethers.Contract = useContract({
     addressOrName: process.env.REACT_APP_TOKEN_FACTORY ?? "",
@@ -35,8 +37,11 @@ export default function TokenCreationPage() {
       symbol,
       ethers.utils.parseEther(supply)
     );
+    addRecentTransaction({
+      hash: tx.hash,
+      description: `Create token ${name}`,
+    });
     const receipt = await tx.wait();
-    console.log(tx.hash);
     const tokenAddress = receipt.events?.at(3)?.args?.tokenAddress;
     return tokenAddress;
   };

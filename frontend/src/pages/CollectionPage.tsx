@@ -6,6 +6,7 @@ import Collection from "../utils/abi/ERC721.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { nftMintAlert, WithdrawalAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 interface CollectionInfo {
   name: string;
@@ -29,6 +30,7 @@ export default function CollectionPage() {
     signerOrProvider: signer,
   });
   const mintAmount = useRef(1);
+  const addRecentTransaction = useAddRecentTransaction();
 
   const [collectionInfo, updateInfo]: [CollectionInfo, Function] = useState({
     name: "",
@@ -88,8 +90,11 @@ export default function CollectionPage() {
     const tx = await contract.mint(mintAmount.current, {
       value: collectionInfo.price.mul(mintAmount.current).toString(),
     });
+    addRecentTransaction({
+      hash: tx.hash,
+      description: `Mint ${mintAmount.current} tokens of ${collectionInfo.name}`,
+    });
     const receipt = await tx.wait();
-    console.log(receipt.transactionHash);
     updateInfoAfterMint();
     return receipt;
   };
