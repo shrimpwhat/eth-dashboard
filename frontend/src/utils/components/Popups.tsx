@@ -15,7 +15,7 @@ export const errorAlert = (msg: string, id: string) => {
   });
 };
 
-const deployedContract = (
+const basePromisePopup = (
   fn: Promise<any>,
   renderFn: (data: any) => ReactNode
 ) => {
@@ -29,22 +29,24 @@ const deployedContract = (
         },
       },
       error: {
-        render({ data }) {
+        render({ data }: any) {
           return <p className="break-all">{data.message}</p>;
         },
+        closeOnClick: true,
       },
     },
     {
       position: "top-right",
-      hideProgressBar: true,
+      hideProgressBar: false,
       closeOnClick: false,
-      autoClose: false,
-      draggable: false,
+      autoClose: 10000,
+      draggable: true,
     }
   );
 };
+
 export const deployedCollectionAlert = (fn: Promise<string>) => {
-  deployedContract(fn, (data: string) => (
+  basePromisePopup(fn, (data: string) => (
     <div>
       <p>
         Collection deployed at address:
@@ -65,7 +67,7 @@ export const deployedCollectionAlert = (fn: Promise<string>) => {
 };
 
 export const deployedTokenAlert = (fn: Promise<string>) => {
-  deployedContract(fn, (data: string) => (
+  basePromisePopup(fn, (data: string) => (
     <div>
       <p>
         Token deployed at address:
@@ -80,88 +82,40 @@ export const deployedTokenAlert = (fn: Promise<string>) => {
   ));
 };
 
-const txAlert = (fn: Promise<any>, renderFn: (data: any) => ReactNode) => {
-  toast.promise(
-    fn,
-    {
-      pending: "Waiting for transaction...",
-      success: {
-        render({ data }) {
-          return renderFn(data);
-        },
-      },
-      error: {
-        render({ data }) {
-          return <p className="break-all">{data.message}</p>;
-        },
-      },
-    },
-    {
-      position: "top-right",
-      hideProgressBar: true,
-      closeOnClick: false,
-      autoClose: false,
-      draggable: true,
-    }
-  );
+export const txAlert = (text: string, fn: Promise<any>) => {
+  basePromisePopup(fn, (data: string) => (
+    <div>
+      <p>{text}</p>
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href={`https://goerli.etherscan.io/tx/${data}`}
+        className="text-blue-600 underline"
+      >
+        View on Etherscan
+      </a>
+    </div>
+  ));
 };
 
 export const nftMintAlert = (fn: Promise<ethers.ContractReceipt>) => {
-  txAlert(fn, (data: ethers.ContractReceipt) => {
-    return (
-      <div>
-        <p>Nft successfuly minted! Check it at Opensea:</p>
-        <ul>
-          {data?.events?.map((event: ethers.Event, index: number) => (
-            <li key={index}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={`https://testnets.opensea.io/assets/goerli/${data?.to}/${event?.args?.tokenId}`}
-                className="text-blue-600 underline"
-              >
-                Link
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  });
-};
-
-export const WithdrawalAlert = (fn: Promise<string>) => {
-  txAlert(fn, (data: string) => {
-    return (
-      <div>
-        <p>Funds successfuly withdrawn!</p>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`https://goerli.etherscan.io/tx/${data}`}
-          className="text-blue-600 underline"
-        >
-          View on Etherscan
-        </a>
-      </div>
-    );
-  });
-};
-
-export const TransferAlert = (fn: Promise<string>) => {
-  txAlert(fn, (data: string) => {
-    return (
-      <div>
-        <p>Tokens successfuly transfered!</p>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`https://goerli.etherscan.io/tx/${data}`}
-          className="text-blue-600 underline"
-        >
-          View on Etherscan
-        </a>
-      </div>
-    );
-  });
+  basePromisePopup(fn, (data: ethers.ContractReceipt) => (
+    <div>
+      <p>Nft successfuly minted! Check it at Opensea:</p>
+      <ul>
+        {data?.events?.map((event: ethers.Event, index: number) => (
+          <li key={index}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://testnets.opensea.io/assets/goerli/${data?.to}/${event?.args?.tokenId}`}
+              className="text-blue-600 underline"
+            >
+              Link
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ));
 };

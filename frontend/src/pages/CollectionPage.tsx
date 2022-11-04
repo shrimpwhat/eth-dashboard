@@ -4,7 +4,7 @@ import { useContract, useSigner, useAccount, useProvider } from "wagmi";
 import Title from "../utils/components/Title";
 import Collection from "../utils/abi/ERC721.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { nftMintAlert, WithdrawalAlert } from "../utils/components/Popups";
+import { nftMintAlert, txAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
@@ -24,9 +24,9 @@ export default function CollectionPage() {
   const { address: contractAddress } = useParams();
   const provider = useProvider({ chainId: 5 });
   const { data: signer } = useSigner();
-  const contract: ethers.Contract = useContract({
-    addressOrName: contractAddress as string,
-    contractInterface: Collection,
+  const contract = useContract({
+    address: contractAddress as string,
+    abi: Collection,
     signerOrProvider: signer,
   });
   const mintAmount = useRef(1);
@@ -73,8 +73,8 @@ export default function CollectionPage() {
   }, [contract, signer]);
 
   const updateInfoAfterMint = async () => {
-    const totalMinted = Number(await contract.totalMinted());
-    const userMintedAmount = Number(await contract.numberMinted(address));
+    const totalMinted = Number(await contract?.totalMinted());
+    const userMintedAmount = Number(await contract?.numberMinted(address));
     const contractBalance = ethers.utils.formatEther(
       await provider.getBalance(contractAddress as string)
     );
@@ -87,7 +87,7 @@ export default function CollectionPage() {
   };
 
   const mint = async () => {
-    const tx = await contract.mint(mintAmount.current, {
+    const tx = await contract?.mint(mintAmount.current, {
       value: collectionInfo.price.mul(mintAmount.current).toString(),
     });
     addRecentTransaction({
@@ -100,7 +100,7 @@ export default function CollectionPage() {
   };
 
   const withdraw = async () => {
-    const tx = await contract.withdraw();
+    const tx = await contract?.withdraw();
     const receipt = await tx.wait();
     console.log(receipt.transactionHash);
     const contractBalance = ethers.utils.formatEther(
@@ -203,7 +203,7 @@ export default function CollectionPage() {
                 <button
                   className="block mx-auto my-5 text-lg border border-black rounded px-3 py-1 duration-500 hover:bg-black hover:text-white"
                   onClick={() => {
-                    WithdrawalAlert(withdraw());
+                    txAlert("Funds successfuly withdrawn!", withdraw());
                   }}
                 >
                   Withdraw

@@ -51,8 +51,8 @@ const CreateCollection = () => {
   const { isConnected } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
-    addressOrName: process.env.REACT_APP_NFT_FACTORY_ADDRESS ?? "",
-    contractInterface: CollectionFactoryInterface,
+    address: process.env.REACT_APP_NFT_FACTORY_ADDRESS as string,
+    abi: CollectionFactoryInterface,
     signerOrProvider: signer,
   });
   const addRecentTransaction = useAddRecentTransaction();
@@ -156,8 +156,8 @@ const MintSingleNft = () => {
   const { isConnected } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
-    addressOrName: process.env.REACT_APP_NFT_MINTER_ADDRESS ?? "",
-    contractInterface: NftMinterInterface,
+    address: process.env.REACT_APP_NFT_MINTER_ADDRESS as string,
+    abi: NftMinterInterface,
     signerOrProvider: signer,
   });
   const addRecentTransaction = useAddRecentTransaction();
@@ -218,7 +218,7 @@ const MintSingleNft = () => {
     const image = await uploadImage();
     if (image) {
       const metdata = await uploadMetadata(image);
-      const tx = await contract.mint("ipfs://" + metdata);
+      const tx = await contract?.mint("ipfs://" + metdata);
       addRecentTransaction({
         hash: tx.hash,
         description: "Mint single nft",

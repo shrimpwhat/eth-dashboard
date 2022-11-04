@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@rainbow-me/rainbowkit": "^0.6.1",
+    "@rainbow-me/rainbowkit": "^0.7.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.11.48",
+    "@types/node": "^18.11.9",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "buffer": "^6.0.3",
@@ -20,7 +20,7 @@
     "react-toastify": "^9.0.8",
     "sass": "^1.55.0",
     "typescript": "^4.7.4",
-    "wagmi": "^0.6.3"
+    "wagmi": "^0.7.10"
   },
   "scripts": {
     "start": "react-scripts start",

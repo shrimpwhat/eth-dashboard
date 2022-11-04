@@ -1,12 +1,12 @@
 import { ethers, BigNumber } from "ethers";
 import { useParams } from "react-router-dom";
 import { useContractReads, useAccount, useContract, useSigner } from "wagmi";
-import abi from "../utils/abi/ERC20.json";
+import abi from "../utils/abi/ERC20";
 import Title from "../utils/components/Title";
 import Input from "../utils/components/Input";
-import { errorAlert, TransferAlert } from "../utils/components/Popups";
+import { errorAlert, txAlert } from "../utils/components/Popups";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useRef, ChangeEvent, FormEvent } from "react";
+import { useRef, ChangeEvent, FormEvent, useEffect } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 export default function TokenPage() {
@@ -21,10 +21,10 @@ export default function TokenPage() {
   const { data: signer } = useSigner();
 
   const contract = {
-    addressOrName: contractAddress as string,
-    contractInterface: abi,
+    address: contractAddress as string,
+    abi,
   };
-  const token: ethers.Contract = useContract({
+  const token = useContract({
     ...contract,
     signerOrProvider: signer,
   });
@@ -32,6 +32,7 @@ export default function TokenPage() {
   const {
     data: tokenData,
     isFetching,
+    isFetchedAfterMount,
     refetch,
   } = useContractReads({
     contracts: [
@@ -46,12 +47,12 @@ export default function TokenPage() {
       {
         ...contract,
         functionName: "balanceOf",
-        args: [address],
+        args: [address ?? ethers.constants.AddressZero],
       },
     ],
   });
 
-  if (isFetching || !address)
+  if ((isFetching && !isFetchedAfterMount) || !address)
     return (
       <>
         <Title text={"Token page"} />
@@ -69,13 +70,15 @@ export default function TokenPage() {
       <div>
         <Title text={"Token page"} />
         <div className="card text-xl">
-          <h1 className="text-2xl font-semibold">{tokenData?.at(0)}</h1>
+          <h1 className="text-2xl font-semibold">
+            {tokenData?.at(0)?.toString()}
+          </h1>
           <p className="text-left">
             Balance:{" "}
             <span className="italic text-blue-500 font-bold">
-              {ethers.utils.formatEther(tokenData?.at(2) ?? 0)}
+              {ethers.utils.formatEther(tokenData?.at(2) ?? "0")}
             </span>{" "}
-            <span className="font-bold">{tokenData?.at(1)}</span>
+            <span className="font-bold">{tokenData?.at(1) as string}</span>
           </p>
           <hr className="my-8" />
           <TransferForm token={token} tokenData={tokenData} refetch={refetch} />
@@ -89,8 +92,8 @@ const TransferForm = ({
   tokenData,
   refetch,
 }: {
-  token: ethers.Contract;
-  tokenData: ethers.utils.Result[] | undefined;
+  token: ethers.Contract | null;
+  tokenData?: [string, string, ethers.BigNumber];
   refetch: Function;
 }) => {
   const transferAddress = useRef("");
@@ -99,7 +102,7 @@ const TransferForm = ({
   const addRecentTransaction = useAddRecentTransaction();
 
   const transferTokens = async (address: string, amount: BigNumber) => {
-    const tx: ethers.ContractTransaction = await token.transfer(
+    const tx: ethers.ContractTransaction = await token?.transfer(
       address,
       amount
     );
@@ -123,9 +126,14 @@ const TransferForm = ({
         ethers.utils.parseEther(transferAmount.current)
       )
     )
-      errorAlert("Insufficient balance", "invalid-transfer-amount");
+      errorAlert(
+        "Insufficient balance for transfer",
+        "invalid-transfer-amount"
+      );
     else {
-      TransferAlert(
+      console.log(transferAmount.current);
+      txAlert(
+        `Successfully transfered ${transferAmount.current} ${tokenData?.at(1)}`,
         transferTokens(
           transferAddress.current,
           ethers.utils.parseEther(transferAmount.current)

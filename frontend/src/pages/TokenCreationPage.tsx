@@ -14,9 +14,9 @@ export default function TokenCreationPage() {
   const { data: signer } = useSigner();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const contract: ethers.Contract = useContract({
-    addressOrName: process.env.REACT_APP_TOKEN_FACTORY ?? "",
-    contractInterface: TokenFactoryAbi,
+  const contract = useContract({
+    address: process.env.REACT_APP_TOKEN_FACTORY as string,
+    abi: TokenFactoryAbi,
     signerOrProvider: signer,
   });
 
@@ -32,7 +32,7 @@ export default function TokenCreationPage() {
 
   const createToken = async () => {
     const { name, symbol, supply } = getTokenData();
-    const tx: ethers.ContractTransaction = await contract.createToken(
+    const tx: ethers.ContractTransaction = await contract?.createToken(
       name,
       symbol,
       ethers.utils.parseEther(supply)
