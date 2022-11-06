@@ -6,7 +6,7 @@ import Title from "../utils/components/Title";
 import Input from "../utils/components/Input";
 import { errorAlert, txAlert } from "../utils/components/Popups";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useRef, ChangeEvent, FormEvent, useEffect } from "react";
+import { useRef, ChangeEvent, FormEvent } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 export default function TokenPage() {
@@ -80,8 +80,9 @@ export default function TokenPage() {
             </span>{" "}
             <span className="font-bold">{tokenData?.at(1) as string}</span>
           </p>
-          <hr className="my-8" />
           <TransferForm token={token} tokenData={tokenData} refetch={refetch} />
+          <ApproveForm token={token} tokenData={tokenData} refetch={refetch} />
+          <MintForm token={token} tokenData={tokenData} refetch={refetch} />
         </div>
       </div>
     );
@@ -120,7 +121,7 @@ const TransferForm = ({
   const handleTransfer = (e: FormEvent) => {
     e.preventDefault();
     if (!ethers.utils.isAddress(transferAddress.current))
-      errorAlert("Invalid address", "invalid-transfer-address");
+      errorAlert("Invalid transfer address", "invalid-transfer-address");
     else if (
       BigNumber.from(tokenData?.at(2)).lt(
         ethers.utils.parseEther(transferAmount.current)
@@ -131,7 +132,6 @@ const TransferForm = ({
         "invalid-transfer-amount"
       );
     else {
-      console.log(transferAmount.current);
       txAlert(
         `Successfully transfered ${transferAmount.current} ${tokenData?.at(1)}`,
         transferTokens(
@@ -143,47 +143,217 @@ const TransferForm = ({
   };
 
   return (
-    <form
-      className="flex flex-wrap items-end justify-around gap-6"
-      onSubmit={handleTransfer}
-    >
-      <Input
-        text="Transfer address"
-        id="transfer-address"
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          transferAddress.current = e.target.value;
-        }}
-      />
-      <div className="flex flex-row items-end gap-3">
+    <>
+      <hr className="mt-8 mb-5" />
+      <form
+        className="flex flex-wrap items-end justify-around gap-6"
+        onSubmit={handleTransfer}
+      >
         <Input
-          text="Transfer amount"
-          id="transfer-amount"
-          type="number"
-          min={0}
-          step={1e-18}
-          className="w-40"
+          text="Transfer address"
+          id="transfer-address"
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            transferAmount.current = e.target.value;
+            transferAddress.current = e.target.value;
           }}
         />
-        <button
-          className="mb-2 text-blue-500 underline text-lg"
-          type="button"
-          onClick={() => {
-            const input = document.getElementById(
-              "transfer-amount"
-            ) as HTMLInputElement;
-            const balance = ethers.utils.formatEther(
-              tokenData?.at(2)?.toString() as string
-            );
-            transferAmount.current = balance;
-            input.value = balance;
+        <div className="flex flex-row items-end gap-3">
+          <Input
+            text="Transfer amount"
+            id="transfer-amount"
+            type="number"
+            min={0}
+            step={1e-18}
+            className="w-40"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              transferAmount.current = e.target.value;
+            }}
+            maxText="max"
+            maxFn={() => {
+              const input = document.getElementById(
+                "transfer-amount"
+              ) as HTMLInputElement;
+              const balance = ethers.utils.formatEther(
+                tokenData?.at(2)?.toString() as string
+              );
+              transferAmount.current = balance;
+              input.value = balance;
+            }}
+          />
+        </div>
+        <button className="submit-button">Transfer</button>
+      </form>
+    </>
+  );
+};
+
+const ApproveForm = ({
+  token,
+  tokenData,
+  refetch,
+}: {
+  token: ethers.Contract | null;
+  tokenData?: [string, string, ethers.BigNumber];
+  refetch: Function;
+}) => {
+  const approveAddress = useRef("");
+  const approveAmount = useRef("0");
+
+  const addRecentTransaction = useAddRecentTransaction();
+
+  const approveTokens = async (address: string, amount: BigNumber) => {
+    const tx: ethers.ContractTransaction = await token?.approve(
+      address,
+      amount
+    );
+    addRecentTransaction({
+      hash: tx.hash,
+      description: `Approve ${tokenData?.at(1)}`,
+    });
+    await tx.wait();
+    refetch();
+    return tx.hash;
+  };
+
+  const handleApprove = (e: FormEvent) => {
+    e.preventDefault();
+    if (!ethers.utils.isAddress(approveAddress.current))
+      errorAlert("Invalid approve address", "invalid-approve-address");
+    else {
+      txAlert(
+        `Successfully approved ${tokenData?.at(1)}`,
+        approveTokens(
+          approveAddress.current,
+          ethers.utils.parseEther(approveAmount.current)
+        )
+      );
+    }
+  };
+
+  return (
+    <>
+      <hr className="mt-8 mb-5" />
+      <form
+        className="flex flex-wrap items-end justify-around gap-6"
+        onSubmit={handleApprove}
+      >
+        <Input
+          text="Approve address"
+          id="approve-address"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            approveAddress.current = e.target.value;
           }}
-        >
-          Max
-        </button>
-      </div>
-      <button className="submit-button">Transfer</button>
-    </form>
+        />
+        <div className="flex flex-row items-end gap-3">
+          <Input
+            text="Approve amount"
+            id="approve-amount"
+            type="number"
+            min={0}
+            step={1e-18}
+            className="w-40"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              approveAmount.current = e.target.value;
+            }}
+            maxText="max"
+            maxFn={() => {
+              const input = document.getElementById(
+                "approve-amount"
+              ) as HTMLInputElement;
+              const maxValue = ethers.utils.formatEther(
+                ethers.constants.MaxUint256
+              );
+              approveAmount.current = maxValue;
+              input.value = maxValue;
+            }}
+          />
+        </div>
+        <button className="submit-button">Approve</button>
+      </form>
+    </>
+  );
+};
+
+const MintForm = ({
+  token,
+  tokenData,
+  refetch,
+}: {
+  token: ethers.Contract | null;
+  tokenData?: [string, string, ethers.BigNumber];
+  refetch: Function;
+}) => {
+  const { address } = useAccount();
+  const mintAddress = useRef("");
+  const mintAmount = useRef("0");
+
+  const addRecentTransaction = useAddRecentTransaction();
+
+  const mintTokens = async (address: string, amount: BigNumber) => {
+    const tx: ethers.ContractTransaction = await token?.mintTo(address, amount);
+    addRecentTransaction({
+      hash: tx.hash,
+      description: `Mint ${ethers.utils.formatUnits(amount)} ${tokenData?.at(
+        1
+      )}`,
+    });
+    await tx.wait();
+    refetch();
+    return tx.hash;
+  };
+
+  const handleMint = (e: FormEvent) => {
+    e.preventDefault();
+    if (!ethers.utils.isAddress(mintAddress.current))
+      errorAlert("Invalid mint address", "invalid-mint-address");
+    else {
+      txAlert(
+        `Successfully minted ${mintAmount.current} ${tokenData?.at(1)}`,
+        mintTokens(
+          mintAddress.current,
+          ethers.utils.parseEther(mintAmount.current)
+        )
+      );
+    }
+  };
+
+  return (
+    <>
+      <hr className="mt-8 mb-5" />
+      <form
+        className="flex flex-wrap items-end justify-around gap-6"
+        onSubmit={handleMint}
+      >
+        <Input
+          className="max-w-full"
+          text="Mint to"
+          id="mint-address"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            mintAddress.current = e.target.value;
+          }}
+          maxText="current"
+          maxFn={() => {
+            const input = document.getElementById(
+              "mint-address"
+            ) as HTMLInputElement;
+            mintAddress.current = address as string;
+            input.value = address as string;
+          }}
+        />
+        <div className="flex flex-row items-end gap-3">
+          <Input
+            text="Mint amount"
+            id="mint-amount"
+            type="number"
+            min={0}
+            step={1e-18}
+            className="w-40"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              mintAmount.current = e.target.value;
+            }}
+          />
+        </div>
+        <button className="submit-button">Mint</button>
+      </form>
+    </>
   );
 };
