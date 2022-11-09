@@ -235,14 +235,19 @@ const MintSingleNft = () => {
         nftMintAlert(mint());
       }}
     >
-      <div className="max-w-max mx-auto">
+      <div className="mx-auto max-w-max">
         <Input text="Name" id="nft_name" className="w-full mb-8" />
         <Input
           text="Description"
           id="nft_description"
           className="w-full mb-8"
         />
-        <Input text="Image" type="file" id="nft_img" className="w-full mb-8" />
+        <Input
+          text="Image"
+          type="file"
+          id="nft_img"
+          className="w-full mb-8 text-sm"
+        />
         {isConnected ? (
           <div className="text-center">
             <button className="submit-button">Create</button>
