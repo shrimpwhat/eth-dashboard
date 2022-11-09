@@ -17,7 +17,7 @@ import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 interface TokenContextInterface {
   token: ethers.Contract | null;
-  tokenData?: [string, string, ethers.BigNumber];
+  tokenData?: [string, string, ethers.BigNumber, string];
   refetch: Function;
 }
 
@@ -61,6 +61,10 @@ export default function TokenPage() {
         functionName: "balanceOf",
         args: [address ?? ethers.constants.AddressZero],
       },
+      {
+        ...contract,
+        functionName: "owner",
+      },
     ],
   });
 
@@ -93,9 +97,9 @@ export default function TokenPage() {
             <span className="font-bold">{tokenData?.at(1) as string}</span>
           </p>
           <TokenContext.Provider value={{ token, tokenData, refetch }}>
+            <MintForm />
             <TransferForm />
             <ApproveForm />
-            <MintForm />
             <BurnForm />
           </TokenContext.Provider>
         </div>
@@ -103,7 +107,7 @@ export default function TokenPage() {
     );
 }
 
-const TransferForm = ({}) => {
+const TransferForm = () => {
   const transferAddress = useRef("");
   const transferAmount = useRef("0");
   const addRecentTransaction = useAddRecentTransaction();
@@ -114,7 +118,7 @@ const TransferForm = ({}) => {
     refetch,
   }: {
     token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber];
+    tokenData?: [string, string, ethers.BigNumber, string];
     refetch?: Function;
   } = useContext(TokenContext);
 
@@ -213,7 +217,7 @@ const ApproveForm = () => {
     refetch,
   }: {
     token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber];
+    tokenData?: [string, string, ethers.BigNumber, string];
     refetch?: Function;
   } = useContext(TokenContext);
 
@@ -301,7 +305,7 @@ const MintForm = () => {
     refetch,
   }: {
     token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber];
+    tokenData?: [string, string, ethers.BigNumber, string];
     refetch?: Function;
   } = useContext(TokenContext);
 
@@ -335,46 +339,48 @@ const MintForm = () => {
     }
   };
 
-  return (
-    <>
-      <hr className="mt-8 mb-5" />
-      <form
-        className="flex flex-wrap items-end justify-around gap-6"
-        onSubmit={handleMint}
-      >
-        <Input
-          text="Mint to"
-          id="mint-address"
-          className="w-52"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            mintAddress.current = e.target.value;
-          }}
-          maxText="current"
-          maxFn={() => {
-            const input = document.getElementById(
-              "mint-address"
-            ) as HTMLInputElement;
-            mintAddress.current = address as string;
-            input.value = address as string;
-          }}
-        />
-        <div className="flex flex-row items-end gap-3">
+  if (tokenData?.at(3) !== address) return null;
+  else
+    return (
+      <>
+        <hr className="mt-8 mb-5" />
+        <form
+          className="flex flex-wrap items-end justify-around gap-6"
+          onSubmit={handleMint}
+        >
           <Input
-            text="Mint amount"
+            text="Mint to"
+            id="mint-address"
             className="w-52"
-            id="mint-amount"
-            type="number"
-            min={0}
-            step={1e-18}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              mintAmount.current = e.target.value;
+              mintAddress.current = e.target.value;
+            }}
+            maxText="current"
+            maxFn={() => {
+              const input = document.getElementById(
+                "mint-address"
+              ) as HTMLInputElement;
+              mintAddress.current = address as string;
+              input.value = address as string;
             }}
           />
-        </div>
-        <button className="submit-button">Mint</button>
-      </form>
-    </>
-  );
+          <div className="flex flex-row items-end gap-3">
+            <Input
+              text="Mint amount"
+              className="w-52"
+              id="mint-amount"
+              type="number"
+              min={0}
+              step={1e-18}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                mintAmount.current = e.target.value;
+              }}
+            />
+          </div>
+          <button className="submit-button">Mint</button>
+        </form>
+      </>
+    );
 };
 
 const BurnForm = () => {
@@ -387,7 +393,7 @@ const BurnForm = () => {
     refetch,
   }: {
     token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber];
+    tokenData?: [string, string, ethers.BigNumber, string];
     refetch?: Function;
   } = useContext(TokenContext);
 
