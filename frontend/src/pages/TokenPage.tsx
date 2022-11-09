@@ -6,16 +6,28 @@ import Title from "../utils/components/Title";
 import Input from "../utils/components/Input";
 import { errorAlert, txAlert } from "../utils/components/Popups";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useRef, ChangeEvent, FormEvent } from "react";
+import {
+  useRef,
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  createContext,
+} from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
+interface TokenContextInterface {
+  token: ethers.Contract | null;
+  tokenData?: [string, string, ethers.BigNumber];
+  refetch: Function;
+}
+
+const TokenContext = createContext<TokenContextInterface>({
+  token: null,
+  tokenData: undefined,
+  refetch: () => {},
+});
+
 export default function TokenPage() {
-  const approveAddress = useRef("");
-  const approveAmount = useRef("0");
-
-  const burnAmount = useRef("0");
-  const mintAmount = useRef("0");
-
   const { address: contractAddress } = useParams();
   const { address } = useAccount();
   const { data: signer } = useSigner();
@@ -80,28 +92,31 @@ export default function TokenPage() {
             </span>{" "}
             <span className="font-bold">{tokenData?.at(1) as string}</span>
           </p>
-          <TransferForm token={token} tokenData={tokenData} refetch={refetch} />
-          <ApproveForm token={token} tokenData={tokenData} refetch={refetch} />
-          <MintForm token={token} tokenData={tokenData} refetch={refetch} />
-          <BurnForm token={token} tokenData={tokenData} refetch={refetch} />
+          <TokenContext.Provider value={{ token, tokenData, refetch }}>
+            <TransferForm />
+            <ApproveForm />
+            <MintForm />
+            <BurnForm />
+          </TokenContext.Provider>
         </div>
       </div>
     );
 }
 
-const TransferForm = ({
-  token,
-  tokenData,
-  refetch,
-}: {
-  token: ethers.Contract | null;
-  tokenData?: [string, string, ethers.BigNumber];
-  refetch: Function;
-}) => {
+const TransferForm = ({}) => {
   const transferAddress = useRef("");
   const transferAmount = useRef("0");
-
   const addRecentTransaction = useAddRecentTransaction();
+
+  const {
+    token,
+    tokenData,
+    refetch,
+  }: {
+    token: ethers.Contract | null;
+    tokenData?: [string, string, ethers.BigNumber];
+    refetch?: Function;
+  } = useContext(TokenContext);
 
   const transferTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.transfer(
@@ -187,19 +202,20 @@ const TransferForm = ({
   );
 };
 
-const ApproveForm = ({
-  token,
-  tokenData,
-  refetch,
-}: {
-  token: ethers.Contract | null;
-  tokenData?: [string, string, ethers.BigNumber];
-  refetch: Function;
-}) => {
+const ApproveForm = () => {
   const approveAddress = useRef("");
   const approveAmount = useRef("0");
-
   const addRecentTransaction = useAddRecentTransaction();
+
+  const {
+    token,
+    tokenData,
+    refetch,
+  }: {
+    token: ethers.Contract | null;
+    tokenData?: [string, string, ethers.BigNumber];
+    refetch?: Function;
+  } = useContext(TokenContext);
 
   const approveTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.approve(
@@ -274,18 +290,20 @@ const ApproveForm = ({
   );
 };
 
-const MintForm = ({
-  token,
-  tokenData,
-  refetch,
-}: {
-  token: ethers.Contract | null;
-  tokenData?: [string, string, ethers.BigNumber];
-  refetch: Function;
-}) => {
+const MintForm = () => {
   const { address } = useAccount();
   const mintAddress = useRef("");
   const mintAmount = useRef("0");
+
+  const {
+    token,
+    tokenData,
+    refetch,
+  }: {
+    token: ethers.Contract | null;
+    tokenData?: [string, string, ethers.BigNumber];
+    refetch?: Function;
+  } = useContext(TokenContext);
 
   const addRecentTransaction = useAddRecentTransaction();
 
@@ -359,18 +377,19 @@ const MintForm = ({
   );
 };
 
-const BurnForm = ({
-  token,
-  tokenData,
-  refetch,
-}: {
-  token: ethers.Contract | null;
-  tokenData?: [string, string, ethers.BigNumber];
-  refetch: Function;
-}) => {
+const BurnForm = () => {
   const burnAmount = useRef("0");
-
   const addRecentTransaction = useAddRecentTransaction();
+
+  const {
+    token,
+    tokenData,
+    refetch,
+  }: {
+    token: ethers.Contract | null;
+    tokenData?: [string, string, ethers.BigNumber];
+    refetch?: Function;
+  } = useContext(TokenContext);
 
   const burnTokens = async (amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.burn(amount);
