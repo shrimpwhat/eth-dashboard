@@ -31,8 +31,7 @@ export default function Input({
       </label>
       <div
         className={
-          (maxText ? "border border-black" : "") +
-          " box-border flex items-center"
+          maxText && "border border-black box-border flex items-center"
         }
       >
         <input
@@ -48,11 +47,7 @@ export default function Input({
           onChange={onChange}
         />
         {maxText && (
-          <button
-            className="max-button font-bold"
-            type="button"
-            onClick={maxFn}
-          >
+          <button className="max-button" type="button" onClick={maxFn}>
             {maxText}
           </button>
         )}

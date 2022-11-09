@@ -83,6 +83,7 @@ export default function TokenPage() {
           <TransferForm token={token} tokenData={tokenData} refetch={refetch} />
           <ApproveForm token={token} tokenData={tokenData} refetch={refetch} />
           <MintForm token={token} tokenData={tokenData} refetch={refetch} />
+          <BurnForm token={token} tokenData={tokenData} refetch={refetch} />
         </div>
       </div>
     );
@@ -324,9 +325,9 @@ const MintForm = ({
         onSubmit={handleMint}
       >
         <Input
-          className="max-w-full"
           text="Mint to"
           id="mint-address"
+          className="w-52"
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             mintAddress.current = e.target.value;
           }}
@@ -342,17 +343,89 @@ const MintForm = ({
         <div className="flex flex-row items-end gap-3">
           <Input
             text="Mint amount"
+            className="w-52"
             id="mint-amount"
             type="number"
             min={0}
             step={1e-18}
-            className="w-40"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               mintAmount.current = e.target.value;
             }}
           />
         </div>
         <button className="submit-button">Mint</button>
+      </form>
+    </>
+  );
+};
+
+const BurnForm = ({
+  token,
+  tokenData,
+  refetch,
+}: {
+  token: ethers.Contract | null;
+  tokenData?: [string, string, ethers.BigNumber];
+  refetch: Function;
+}) => {
+  const burnAmount = useRef("0");
+
+  const addRecentTransaction = useAddRecentTransaction();
+
+  const burnTokens = async (amount: BigNumber) => {
+    const tx: ethers.ContractTransaction = await token?.burn(amount);
+    addRecentTransaction({
+      hash: tx.hash,
+      description: `Burn ${ethers.utils.formatUnits(amount)} ${tokenData?.at(
+        1
+      )}`,
+    });
+    await tx.wait();
+    refetch();
+    return tx.hash;
+  };
+
+  const handleBurn = (e: FormEvent) => {
+    e.preventDefault();
+    if (
+      ethers.utils
+        .parseEther(burnAmount.current)
+        .lte(tokenData?.at(2) as ethers.BigNumberish)
+    )
+      txAlert(
+        `Successfully burned ${burnAmount.current} ${tokenData?.at(1)}`,
+        burnTokens(ethers.utils.parseEther(burnAmount.current))
+      );
+    else errorAlert("Insufficient balance for transfer", "invalid-burn-amount");
+  };
+
+  return (
+    <>
+      <hr className="mt-8 mb-5" />
+      <form
+        className="flex flex-wrap items-end justify-center gap-6"
+        onSubmit={handleBurn}
+      >
+        <Input
+          text="Burn amont"
+          id="burn-amount"
+          className="w-52"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            burnAmount.current = e.target.value;
+          }}
+          maxText="max"
+          maxFn={() => {
+            const input = document.getElementById(
+              "burn-amount"
+            ) as HTMLInputElement;
+            const balance = ethers.utils.formatEther(
+              tokenData?.at(2) as ethers.BigNumberish
+            );
+            burnAmount.current = balance;
+            input.value = balance;
+          }}
+        />
+        <button className="submit-button">Burn</button>
       </form>
     </>
   );
