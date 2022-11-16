@@ -36,9 +36,7 @@ contract NftStaking is ReentrancyGuard {
     }
 
     mapping(address => Staker) public stakers;
-
     mapping(uint256 => address) public stakerAddress;
-
     mapping(uint256 => uint256) private stakedTokenIdxs;
 
     function stake(uint256 _tokenId) external nonReentrant {
