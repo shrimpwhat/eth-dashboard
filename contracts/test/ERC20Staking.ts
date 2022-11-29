@@ -117,4 +117,15 @@ describe("ERC20 staking", () => {
     );
     expect(balance).closeTo(getProfit(signer2Balance, duration, apr), 1e17);
   });
+
+  it("Should compound rewards", async () => {
+    const { token, staking, signer1 } = await loadFixture(setup);
+    await staking.stake(ethers.utils.parseEther("100"));
+    await time.increase(3600);
+    const balance = await token.balanceOf(signer1.address);
+    const shares = await staking.balanceOf(signer1.address);
+    await staking.compound();
+    expect(balance).eq(await token.balanceOf(signer1.address));
+    expect(shares).lt(await staking.balanceOf(signer1.address));
+  });
 });
