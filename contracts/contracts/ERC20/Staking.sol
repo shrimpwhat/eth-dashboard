@@ -98,13 +98,16 @@ contract StakingPool is Ownable {
         getReward();
     }
 
-    function getReward() public updateReward(msg.sender) {
-        uint256 reward = earned(msg.sender);
-        if (reward > 0) {
-            rewards[msg.sender] = 0;
-            stakedToken.safeTransfer(msg.sender, reward);
-            emit RewardPaid(msg.sender, reward);
-        }
+    function getReward() public updateReward(msg.sender) returns (uint reward) {
+        reward = earned(msg.sender);
+        require(reward > 0, "Nothing to harvest");
+        rewards[msg.sender] = 0;
+        stakedToken.safeTransfer(msg.sender, reward);
+        emit RewardPaid(msg.sender, reward);
+    }
+
+    function compound() external {
+        stake(getReward());
     }
 
     function setRewardsDuration(uint _duration) external onlyOwner {
