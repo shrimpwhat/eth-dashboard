@@ -1,21 +1,45 @@
-import { ethers } from "ethers";
+import { ethers, BigNumber, BigNumberish } from "ethers";
 import { useParams } from "react-router-dom";
-import { useContractReads, useAccount, useContract, useSigner } from "wagmi";
+import {
+  useToken,
+  useAccount,
+  useContract,
+  useSigner,
+  useContractReads,
+} from "wagmi";
 import abi from "../../utils/abi/ERC20";
 import Title from "../../utils/components/Title";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { createContext } from "react";
-import { TransferForm, MintForm, ApproveForm, BurnForm } from "./forms";
+import {
+  TransferForm,
+  MintForm,
+  ApproveForm,
+  BurnForm,
+  StakingForm,
+} from "./forms";
+
+interface TokenProps {
+  address?: string;
+  decimals?: number;
+  name?: string;
+  symbol?: string;
+  owner?: string;
+  totalSupply?: {
+    formatted: string;
+    value: BigNumber;
+  };
+  balance: BigNumberish;
+}
 
 interface TokenContextInterface {
   token: ethers.Contract | null;
-  tokenData?: [string, string, ethers.BigNumber, string];
+  tokenData?: TokenProps;
   refetch: Function;
 }
 
 const TokenContext = createContext<TokenContextInterface>({
   token: null,
-  tokenData: undefined,
   refetch: () => {},
 });
 export { TokenContext };
@@ -34,21 +58,8 @@ export default function TokenPage() {
     signerOrProvider: signer,
   });
 
-  const {
-    data: tokenData,
-    isFetching,
-    isFetchedAfterMount,
-    refetch,
-  } = useContractReads({
+  const { data, refetch } = useContractReads({
     contracts: [
-      {
-        ...contract,
-        functionName: "name",
-      },
-      {
-        ...contract,
-        functionName: "symbol",
-      },
       {
         ...contract,
         functionName: "balanceOf",
@@ -61,7 +72,9 @@ export default function TokenPage() {
     ],
   });
 
-  if ((isFetching && !isFetchedAfterMount) || !address)
+  const tokenInfo = useToken({ address: contractAddress as `0x${string}` });
+
+  if ((tokenInfo.isFetching && !tokenInfo.isFetchedAfterMount) || !address)
     return (
       <>
         <Title text={"Token page"} />
@@ -79,21 +92,31 @@ export default function TokenPage() {
       <div>
         <Title text={"Token page"} />
         <div className="card text-xl">
-          <h1 className="text-2xl font-semibold">
-            {tokenData?.at(0)?.toString()}
-          </h1>
+          <h1 className="text-2xl font-semibold">{tokenInfo.data?.name}</h1>
+          <h2 className="my-2">{contractAddress}</h2>
           <p className="text-left">
             Balance:{" "}
             <span className="italic text-blue-500 font-bold">
-              {ethers.utils.formatEther(tokenData?.at(2) ?? "0")}
+              {ethers.utils.formatEther(data?.at(0) ?? 0)}
             </span>{" "}
-            <span className="font-bold">{tokenData?.at(1) as string}</span>
+            <span className="font-bold">{tokenInfo.data?.symbol}</span>
           </p>
-          <TokenContext.Provider value={{ token, tokenData, refetch }}>
+          <TokenContext.Provider
+            value={{
+              token,
+              tokenData: {
+                balance: data?.at(0) ?? 0,
+                owner: data?.at(1) as string,
+                ...tokenInfo?.data,
+              },
+              refetch,
+            }}
+          >
             <MintForm />
             <TransferForm />
             <ApproveForm />
             <BurnForm />
+            <StakingForm />
           </TokenContext.Provider>
         </div>
       </div>

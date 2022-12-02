@@ -10,15 +10,7 @@ const ApproveForm = () => {
   const approveAmount = useRef("0");
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    token,
-    tokenData,
-    refetch,
-  }: {
-    token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber, string];
-    refetch?: Function;
-  } = useContext(TokenContext);
+  const { token, tokenData, refetch } = useContext(TokenContext);
 
   const approveTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.approve(
@@ -27,7 +19,7 @@ const ApproveForm = () => {
     );
     addRecentTransaction({
       hash: tx.hash,
-      description: `Approve ${tokenData?.at(1)}`,
+      description: `Approve ${tokenData?.symbol}`,
     });
     await tx.wait();
     refetch();
@@ -40,7 +32,7 @@ const ApproveForm = () => {
       errorAlert("Invalid approve address", "invalid-approve-address");
     else {
       txAlert(
-        `Successfully approved ${tokenData?.at(1)}`,
+        `Successfully approved ${tokenData?.symbol}`,
         approveTokens(
           approveAddress.current,
           ethers.utils.parseEther(approveAmount.current)

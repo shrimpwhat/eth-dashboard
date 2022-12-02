@@ -10,7 +10,7 @@ import { infuraProvider } from "wagmi/providers/infura";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, provider } = configureChains(
-  [chain.hardhat, chain.goerli],
+  [chain.goerli, chain.hardhat],
   [
     infuraProvider({ apiKey: process.env.REACT_APP_INFURA_KEY }),
     publicProvider(),
@@ -37,7 +37,7 @@ root.render(
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider
         chains={chains}
-        // initialChain={chain.goerli}
+        initialChain={chain.goerli}
         showRecentTransactions={true}
       >
         <App />

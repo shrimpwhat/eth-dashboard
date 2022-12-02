@@ -3,7 +3,7 @@ import IndexPage from "./pages/IndexPage";
 import NftMintPage from "./pages/NftMenu";
 import { ToastContainer } from "react-toastify";
 import CollectionPage from "./pages/CollectionPage";
-import TokenPage from "./pages/TokePage/TokenPage";
+import TokenPage from "./pages/TokenPage/TokenPage";
 import TokenCreationPage from "./pages/TokenCreationPage";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 

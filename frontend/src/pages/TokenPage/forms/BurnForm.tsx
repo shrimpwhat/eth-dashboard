@@ -9,23 +9,15 @@ const BurnForm = () => {
   const burnAmount = useRef("0");
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    token,
-    tokenData,
-    refetch,
-  }: {
-    token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber, string];
-    refetch?: Function;
-  } = useContext(TokenContext);
+  const { token, tokenData, refetch } = useContext(TokenContext);
 
   const burnTokens = async (amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.burn(amount);
     addRecentTransaction({
       hash: tx.hash,
-      description: `Burn ${ethers.utils.formatUnits(amount)} ${tokenData?.at(
-        1
-      )}`,
+      description: `Burn ${ethers.utils.formatUnits(amount)} ${
+        tokenData?.symbol
+      }`,
     });
     await tx.wait();
     refetch();
@@ -35,12 +27,10 @@ const BurnForm = () => {
   const handleBurn = (e: FormEvent) => {
     e.preventDefault();
     if (
-      ethers.utils
-        .parseEther(burnAmount.current)
-        .lte(tokenData?.at(2) as ethers.BigNumberish)
+      ethers.utils.parseEther(burnAmount.current).lte(tokenData?.balance ?? 0)
     )
       txAlert(
-        `Successfully burned ${burnAmount.current} ${tokenData?.at(1)}`,
+        `Successfully burned ${burnAmount.current} ${tokenData?.symbol}`,
         burnTokens(ethers.utils.parseEther(burnAmount.current))
       );
     else errorAlert("Insufficient balance for transfer", "invalid-burn-amount");
@@ -65,9 +55,7 @@ const BurnForm = () => {
             const input = document.getElementById(
               "burn-amount"
             ) as HTMLInputElement;
-            const balance = ethers.utils.formatEther(
-              tokenData?.at(2) as ethers.BigNumberish
-            );
+            const balance = ethers.utils.formatEther(tokenData?.balance ?? 0);
             burnAmount.current = balance;
             input.value = balance;
           }}

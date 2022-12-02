@@ -40,5 +40,6 @@ describe("Staking factory", () => {
       .then(async (tx: ContractTransaction) => await tx.wait());
     const pools = await factory.getUserPools(signer.address);
     expect(pools.length).eq(1);
+    expect(await factory.tokenStakings(token.address)).eq(pools[0]);
   });
 });

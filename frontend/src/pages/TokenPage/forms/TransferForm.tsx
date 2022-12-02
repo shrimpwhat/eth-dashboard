@@ -10,15 +10,7 @@ const TransferForm = () => {
   const transferAmount = useRef("0");
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    token,
-    tokenData,
-    refetch,
-  }: {
-    token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber, string];
-    refetch?: Function;
-  } = useContext(TokenContext);
+  const { token, tokenData, refetch } = useContext(TokenContext);
 
   const transferTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.transfer(
@@ -27,9 +19,9 @@ const TransferForm = () => {
     );
     addRecentTransaction({
       hash: tx.hash,
-      description: `Transfer ${ethers.utils.formatUnits(
-        amount
-      )} ${tokenData?.at(1)}`,
+      description: `Transfer ${ethers.utils.formatUnits(amount)} ${
+        tokenData?.symbol
+      }`,
     });
     await tx.wait();
     refetch?.();
@@ -41,7 +33,7 @@ const TransferForm = () => {
     if (!ethers.utils.isAddress(transferAddress.current))
       errorAlert("Invalid transfer address", "invalid-transfer-address");
     else if (
-      BigNumber.from(tokenData?.at(2)).lt(
+      BigNumber.from(tokenData?.balance).lt(
         ethers.utils.parseEther(transferAmount.current)
       )
     )
@@ -51,7 +43,7 @@ const TransferForm = () => {
       );
     else {
       txAlert(
-        `Successfully transfered ${transferAmount.current} ${tokenData?.at(1)}`,
+        `Successfully transfered ${transferAmount.current} ${tokenData?.symbol}`,
         transferTokens(
           transferAddress.current,
           ethers.utils.parseEther(transferAmount.current)
@@ -90,9 +82,7 @@ const TransferForm = () => {
               const input = document.getElementById(
                 "transfer-amount"
               ) as HTMLInputElement;
-              const balance = ethers.utils.formatEther(
-                tokenData?.at(2)?.toString() as string
-              );
+              const balance = ethers.utils.formatEther(tokenData?.balance ?? 0);
               transferAmount.current = balance;
               input.value = balance;
             }}

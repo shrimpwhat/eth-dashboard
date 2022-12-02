@@ -70,7 +70,7 @@ export default function CollectionPage() {
         setFetchStatus(true);
       }
     })();
-  }, [contract, signer]);
+  }, [contract, signer, address, contractAddress, provider]);
 
   const updateInfoAfterMint = async () => {
     const totalMinted = Number(await contract?.totalMinted());

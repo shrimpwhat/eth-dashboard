@@ -11,15 +11,7 @@ const MintForm = () => {
   const mintAddress = useRef("");
   const mintAmount = useRef("0");
 
-  const {
-    token,
-    tokenData,
-    refetch,
-  }: {
-    token: ethers.Contract | null;
-    tokenData?: [string, string, ethers.BigNumber, string];
-    refetch?: Function;
-  } = useContext(TokenContext);
+  const { token, tokenData, refetch } = useContext(TokenContext);
 
   const addRecentTransaction = useAddRecentTransaction();
 
@@ -27,9 +19,9 @@ const MintForm = () => {
     const tx: ethers.ContractTransaction = await token?.mintTo(address, amount);
     addRecentTransaction({
       hash: tx.hash,
-      description: `Mint ${ethers.utils.formatUnits(amount)} ${tokenData?.at(
-        1
-      )}`,
+      description: `Mint ${ethers.utils.formatUnits(amount)} ${
+        tokenData?.symbol
+      }`,
     });
     await tx.wait();
     refetch?.();
@@ -42,7 +34,7 @@ const MintForm = () => {
       errorAlert("Invalid mint address", "invalid-mint-address");
     else {
       txAlert(
-        `Successfully minted ${mintAmount.current} ${tokenData?.at(1)}`,
+        `Successfully minted ${mintAmount.current} ${tokenData?.symbol}`,
         mintTokens(
           mintAddress.current,
           ethers.utils.parseEther(mintAmount.current)
@@ -51,7 +43,7 @@ const MintForm = () => {
     }
   };
 
-  if (tokenData?.at(3) !== address) return null;
+  if (tokenData?.owner !== address) return null;
   else
     return (
       <>
