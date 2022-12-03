@@ -86,6 +86,10 @@ contract StakingPool is Ownable {
 
     function withdraw(uint256 amount) public updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
+        require(
+            amount <= balanceOf[msg.sender],
+            "Not enough funds to withdraw"
+        );
         balanceOf[msg.sender] -= amount;
         totalSupply -= amount;
         stakedToken.safeTransfer(msg.sender, amount);
