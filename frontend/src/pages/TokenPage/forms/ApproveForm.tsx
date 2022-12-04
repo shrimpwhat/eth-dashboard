@@ -42,7 +42,7 @@ const ApproveForm = () => {
   };
 
   return (
-    <>
+    <div>
       <hr className="mt-8 mb-5" />
       <form
         className="flex flex-wrap items-end justify-around gap-6"
@@ -81,7 +81,7 @@ const ApproveForm = () => {
         </div>
         <button className="submit-button">Approve</button>
       </form>
-    </>
+    </div>
   );
 };
 

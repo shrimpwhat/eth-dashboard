@@ -37,7 +37,7 @@ const BurnForm = () => {
   };
 
   return (
-    <>
+    <div>
       <hr className="mt-8 mb-5" />
       <form
         className="flex flex-wrap items-end justify-center gap-6"
@@ -62,7 +62,7 @@ const BurnForm = () => {
         />
         <button className="submit-button">Burn</button>
       </form>
-    </>
+    </div>
   );
 };
 

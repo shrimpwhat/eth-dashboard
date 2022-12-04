@@ -53,7 +53,7 @@ const TransferForm = () => {
   };
 
   return (
-    <>
+    <div>
       <hr className="mt-8 mb-5" />
       <form
         className="flex flex-wrap items-end justify-around gap-6"
@@ -90,7 +90,7 @@ const TransferForm = () => {
         </div>
         <button className="submit-button">Transfer</button>
       </form>
-    </>
+    </div>
   );
 };
 export default TransferForm;

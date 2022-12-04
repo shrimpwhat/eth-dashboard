@@ -46,7 +46,7 @@ const MintForm = () => {
   if (tokenData?.owner !== address) return null;
   else
     return (
-      <>
+      <div>
         <hr className="mt-8 mb-5" />
         <form
           className="flex flex-wrap items-end justify-around gap-6"
@@ -83,7 +83,7 @@ const MintForm = () => {
           </div>
           <button className="submit-button">Mint</button>
         </form>
-      </>
+      </div>
     );
 };
 
