@@ -10,7 +10,10 @@ import * as React from "react";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
+import ImageIcon from "@mui/icons-material/Image";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Drawer from "@mui/material/Drawer";
+import TollIcon from "@mui/icons-material/Toll";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -20,13 +23,11 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import HomeIcon from "@mui/icons-material/Home";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { styled, useTheme } from "@mui/material/styles";
 
 function App() {
@@ -65,7 +66,7 @@ function App() {
     alignItems: "center",
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar,
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
   }));
   const Main = styled("main", {
     shouldForwardProp: (prop) => prop !== "open",
@@ -89,9 +90,11 @@ function App() {
   }));
 
   return (
-    <>
+    <Router>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
+        <ToastContainer />
+
         <AppBar open={open}>
           <Toolbar sx={{}}>
             <IconButton
@@ -103,14 +106,17 @@ function App() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              Persistent drawer
+            <Typography variant="h6" component="div">
+              Web3 Dev Dashboard
             </Typography>
-            <Box sx={{ ml: "auto" }}>
-              <ConnectButton chainStatus="none" />
-            </Box>
+            {!matches && (
+              <Box sx={{ ml: "auto" }}>
+                <ConnectButton chainStatus="none" />
+              </Box>
+            )}
           </Toolbar>
         </AppBar>
+
         <Drawer
           sx={{
             width: drawerWidth,
@@ -128,12 +134,9 @@ function App() {
           {matches && (
             <>
               <DrawerHeader>
+                <ConnectButton chainStatus={"none"} />
                 <IconButton onClick={handleDrawerClose}>
-                  {theme.direction === "ltr" ? (
-                    <ChevronLeftIcon />
-                  ) : (
-                    <ChevronRightIcon />
-                  )}
+                  <ChevronLeftIcon />
                 </IconButton>
               </DrawerHeader>
               <Divider />
@@ -144,72 +147,38 @@ function App() {
               if (!matches) setOpen(false);
             }}
           >
-            <ConnectButton />
-            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
+            {[
+              ["Home", "/", <HomeIcon />],
+              ["NFT", "/nft", <ImageIcon />],
+              ["ERC20", "/token", <TollIcon />],
+              ["DEX", "/", <SwapHorizIcon />],
+            ].map((item, index) => (
+              <ListItem key={index} disablePadding>
+                <ListItemButton component={Link} to={item[1] as string}>
+                  <ListItemIcon>{item[2]}</ListItemIcon>
+                  <ListItemText primary={item[0]} />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Drawer>
+
         <Main open={open}>
           <DrawerHeader />
-          <Typography>123</Typography>
+          <Routes>
+            <Route path="/" element={<IndexPage />} />
+            <Route path="nft">
+              <Route path="" element={<NftMintPage />} />
+              <Route path=":address" element={<CollectionPage />} />
+            </Route>
+            <Route path="token">
+              <Route path="" element={<TokenCreationPage />} />
+              <Route path=":address" element={<TokenPage />} />
+            </Route>
+          </Routes>
         </Main>
       </Box>
-      <Router>
-        <header></header>
-        <main className="flex h-screen relative">
-          <div className="bg-purple-200 w-40 fixed h-full md:w-60 p-5">
-            <div className="mb-6"></div>
-            <nav>
-              <ul className="list-none">
-                <li className="mb-5">
-                  <Link to="/">Home</Link>
-                </li>
-                <li>
-                  <Link to="/nft">Mint NFT</Link>
-                </li>
-                <li className="my-5">
-                  <Link to="">NFT staking</Link>
-                </li>
-                <li>
-                  <Link to="/token/create">ERC20</Link>
-                </li>
-                <li className="my-5">
-                  <Link to="">Swap</Link>
-                </li>
-              </ul>
-            </nav>
-          </div>
-          <div className="w-full pl-40 md:pl-60">
-            <div className="w-full h-full p-5">
-              <ToastContainer />
-              <Routes>
-                <Route path="/" element={<IndexPage />} />
-                <Route path="nft">
-                  <Route path="" element={<NftMintPage />} />
-                  <Route
-                    path="collection/:address"
-                    element={<CollectionPage />}
-                  />
-                </Route>
-                <Route path="token">
-                  <Route path=":address" element={<TokenPage />} />
-                  <Route path="create" element={<TokenCreationPage />} />
-                </Route>
-              </Routes>
-            </div>
-          </div>
-        </main>
-        <footer></footer>
-      </Router>
-    </>
+    </Router>
   );
 }
 
