@@ -10,9 +10,9 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, provider } = configureChains(
-  [chain.goerli, chain.hardhat],
+  [chain.goerli],
   [
-    alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY }),
+    alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY as string }),
     publicProvider(),
   ]
 );
@@ -35,11 +35,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider
-        chains={chains}
-        initialChain={chain.goerli}
-        showRecentTransactions={true}
-      >
+      <RainbowKitProvider chains={chains} showRecentTransactions={true}>
         <App />
       </RainbowKitProvider>
     </WagmiConfig>
