@@ -7,17 +7,19 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { deepPurple } from "@mui/material/colors";
 
 const { chains, provider } = configureChains(
-  [chain.goerli, chain.hardhat],
+  [chain.goerli],
   [
-    alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY }),
+    alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY as string }),
     publicProvider(),
   ]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "Ethereum Dashboard",
+  appName: "Web3 Dev Dashboard",
   chains,
 });
 
@@ -31,6 +33,14 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: deepPurple.A700,
+    },
+  },
+});
+
 root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
@@ -39,7 +49,9 @@ root.render(
         initialChain={chain.goerli}
         showRecentTransactions={true}
       >
-        <App />
+        <ThemeProvider theme={theme}>
+          <App />
+        </ThemeProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   </React.StrictMode>
