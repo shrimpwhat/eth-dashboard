@@ -179,8 +179,10 @@ const MintSingleNft = () => {
           },
         }
       );
-      const { IpfsHash } = await response.json();
-      return IpfsHash;
+      if (response.ok) {
+        const { IpfsHash } = await response.json();
+        return IpfsHash;
+      } else throw new Error("Failed to pin image to IPFS");
     } else {
       throw new Error("No files added!");
     }
