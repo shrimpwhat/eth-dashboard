@@ -8,7 +8,7 @@ contract NftMinter is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private tokenId;
 
-    constructor() ERC721("EthDashboardNFT", "ethNFT") {}
+    constructor() ERC721("Web3Dashboard", "wNFT") {}
 
     function mint(string calldata metadataURI) external {
         uint newTokenId = tokenId.current();
