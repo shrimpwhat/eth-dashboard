@@ -1,7 +1,15 @@
-import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
-import { errorAlert } from "./Popups";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme, styled } from "@mui/material/styles";
+
+type FormProps = {
+  address: string;
+};
 
 export default function FindContract({
   url,
@@ -10,32 +18,42 @@ export default function FindContract({
   url: string;
   text: string;
 }) {
-  const address = useRef("");
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const navigate = useNavigate();
 
+  const handleSubmit = ({ address }: FormProps) => {
+    navigate(url + address);
+  };
+
+  const Wrapper = styled(Container)(() => ({
+    display: "flex",
+    gap: 15,
+    flexDirection: matches ? "row" : "column",
+    alignItems: matches ? "normal" : "center",
+  }));
+
   return (
-    <>
-      <div className="flex items-stretch mt-10 w-2/3 mx-auto flex-wrap justify-center box-border">
-        <input
-          id="find-address"
-          className="border border-black p-1 grow"
-          placeholder={text}
-          onChange={(e) => {
-            address.current = e.target.value;
-          }}
+    <FormContainer onSuccess={handleSubmit}>
+      <Wrapper maxWidth="md">
+        <TextFieldElement
+          label={text}
+          name="address"
+          helperText="Find already deployed contract"
+          parseError={() => "Not an ethereum address!"}
+          fullWidth
+          inputProps={{ sx: { height: "50px", boxSizing: "border-box" } }}
+          validation={{ validate: (s) => ethers.utils.isAddress(s) }}
         />
-        <button
-          className="ml-3 py-1 px-3 submit-button"
-          onClick={() => {
-            if (ethers.utils.isAddress(address.current))
-              navigate(url + address.current);
-            else errorAlert("Not an ethereum address!", "invalid-address");
-          }}
+        <Button
+          variant="contained"
+          type="submit"
+          sx={{ height: "50px", width: "90px" }}
         >
           Find
-        </button>
-      </div>
-      <hr className="my-12" />
-    </>
+        </Button>
+      </Wrapper>
+      <Divider sx={{ my: 6 }} />
+    </FormContainer>
   );
 }

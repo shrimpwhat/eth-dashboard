@@ -39,6 +39,15 @@ const theme = createTheme({
       main: deepPurple.A700,
     },
   },
+  typography: {
+    body2: {
+      fontSize: 18,
+    },
+    h5: {
+      fontWeight: 600,
+      textAlign: "center",
+    },
+  },
 });
 
 root.render(

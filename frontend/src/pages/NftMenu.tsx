@@ -1,4 +1,3 @@
-import Title from "../utils/components/Title";
 import Input from "../utils/components/Input";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import FindContract from "../utils/components/FindContract";
@@ -14,34 +13,46 @@ import {
 import { ethers } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
-const nonActive = "border rounded border-black p-3 ";
-const active = nonActive + "bg-purple-200";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import Typography from "@mui/material/Typography";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 
 export default function NftMintPage() {
   const [activeButton, setActiveButton] = useState(1);
 
   return (
     <div className="text-xl">
-      <Title text="Mint NFT" />
-      <FindContract url="/nft/collection/" text={"Collection address"} />
-      <div className="mb-8 flex justify-center gap-6 flex-wrap">
-        <button
-          className={activeButton === 1 ? active : nonActive}
-          onClick={() => {
-            setActiveButton(1);
-          }}
-        >
-          Mint one nft
-        </button>
-        <button
-          className={activeButton === 2 ? active : nonActive}
-          onClick={() => {
-            setActiveButton(2);
-          }}
-        >
-          Create collection
-        </button>
-      </div>
+      <Typography variant="h5" mb={5}>
+        Mint NFT
+      </Typography>
+      <FindContract url="/nft/" text={"Collection address"} />
+      <Container
+        maxWidth="xs"
+        sx={{ display: "flex", justifyContent: "center", mb: 6 }}
+      >
+        <ButtonGroup>
+          <Button
+            onClick={() => {
+              setActiveButton(1);
+            }}
+            sx={{ maxwidth: "190px", width: "100%" }}
+            variant={activeButton === 1 ? "outlined" : "contained"}
+          >
+            Mint one nft
+          </Button>
+          <Button
+            onClick={() => {
+              setActiveButton(2);
+            }}
+            sx={{ maxwidth: "190px", width: "100%" }}
+            variant={activeButton === 2 ? "outlined" : "contained"}
+          >
+            Create collection
+          </Button>
+        </ButtonGroup>
+      </Container>
       <div>{activeButton === 1 ? <MintSingleNft /> : <CreateCollection />}</div>
     </div>
   );
@@ -229,37 +240,46 @@ const MintSingleNft = () => {
   };
 
   return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        nftMintAlert(mint());
-      }}
-    >
-      <div className="mx-auto max-w-max">
-        <Input text="Name" id="nft_name" className="w-full mb-8" />
-        <Input
-          text="Description"
-          id="nft_description"
-          className="w-full mb-8"
-        />
-        <Input
-          text="Image"
-          type="file"
-          id="nft_img"
-          className="w-full mb-8 text-sm"
-        />
-        {isConnected ? (
-          <div className="text-center">
-            <button className="submit-button">Create</button>
+    <FormContainer>
+      {/* <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          nftMintAlert(mint());
+        }}
+      > */}
+      <TextFieldElement label="Name" name="name" required />
+      <TextFieldElement label="Description" name="description" required />
+
+      {/* const InputFile = withStyles({
+  root: {
+    "& label.Mui-focused": {
+      color: "green",
+    },
+    "& .MuiInput-underline:after": {
+      borderBottomColor: "green",
+    },
+  },
+})(({ classes, ...props }) => {
+  return <MuiInputBase type="file" className={classes.root} {...props} />;
+}); */}
+
+      <Input
+        text="Image"
+        type="file"
+        id="nft_img"
+        className="w-full mb-8 text-sm"
+      />
+      {isConnected ? (
+        <div className="text-center">
+          <button className="submit-button">Create</button>
+        </div>
+      ) : (
+        <div className="flex">
+          <div className="mx-auto">
+            <ConnectButton />
           </div>
-        ) : (
-          <div className="flex">
-            <div className="mx-auto">
-              <ConnectButton />
-            </div>
-          </div>
-        )}
-      </div>
-    </form>
+        </div>
+      )}
+    </FormContainer>
   );
 };
