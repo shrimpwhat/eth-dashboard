@@ -12,6 +12,7 @@ import {
 } from "../utils/components/Popups";
 import { ethers } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { toast } from "react-toastify";
 
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Typography from "@mui/material/Typography";
@@ -38,7 +39,7 @@ export default function NftMintPage() {
               setActiveButton(1);
             }}
             sx={{ maxwidth: "190px", width: "100%" }}
-            variant={activeButton === 1 ? "outlined" : "contained"}
+            variant={activeButton === 1 ? "contained" : "outlined"}
           >
             Mint one nft
           </Button>
@@ -47,7 +48,7 @@ export default function NftMintPage() {
               setActiveButton(2);
             }}
             sx={{ maxwidth: "190px", width: "100%" }}
-            variant={activeButton === 2 ? "outlined" : "contained"}
+            variant={activeButton === 2 ? "contained" : "outlined"}
           >
             Create collection
           </Button>
@@ -172,37 +173,38 @@ const MintSingleNft = () => {
     signerOrProvider: signer,
   });
   const addRecentTransaction = useAddRecentTransaction();
+  const [step, setStep] = useState(1);
 
-  const uploadImage = async (): Promise<string | undefined> => {
+  // const [file, setFile] = useState<File | undefined>();
+  // const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setFile(event.target.files?.[0]);
+  // };
+
+  const uploadImage = async (image: File): Promise<string> => {
     const formData = new FormData();
-    const image = (
-      document.getElementById("nft_img") as HTMLInputElement
-    ).files?.item(0);
-    if (image) {
-      formData.append("file", image);
-      const response = await fetch(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
-          },
-        }
-      );
-      const { IpfsHash } = await response.json();
-      return IpfsHash;
-    } else {
-      throw new Error("No files added!");
-    }
+    // const image = (
+    //   document.getElementById("nft_img") as HTMLInputElement
+    // ).files?.item(0);
+    formData.append("file", image);
+    const response = await fetch(
+      "https://api.pinata.cloud/pinning/pinFileToIPFS",
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
+        },
+      }
+    );
+    const { IpfsHash } = await response.json();
+    return IpfsHash;
   };
 
-  const uploadMetadata = async (imageHash: string): Promise<string> => {
-    const name = (document.getElementById("nft_name") as HTMLInputElement)
-      .value;
-    const description = (
-      document.getElementById("nft_description") as HTMLInputElement
-    ).value;
+  const uploadMetadata = async (
+    name: string,
+    description: string,
+    imageHash: string
+  ): Promise<string> => {
     const data = JSON.stringify({
       pinataContent: {
         name,
@@ -225,61 +227,68 @@ const MintSingleNft = () => {
     return IpfsHash;
   };
 
-  const mint = async () => {
-    const image = await uploadImage();
-    if (image) {
-      const metdata = await uploadMetadata(image);
-      const tx = await contract?.mint("ipfs://" + metdata);
-      addRecentTransaction({
-        hash: tx.hash,
-        description: "Mint single nft",
-      });
-      const receipt = await tx.wait();
-      return receipt;
-    }
+  const getMetadata = async ({ name, description, image }: FormProps) => {
+    const imageHash = await uploadImage(image);
+    const metadata = await uploadMetadata(name, description, imageHash);
+    return metadata;
+  };
+
+  const sendTx = async (metadata: string) => {
+    const tx = await contract?.mint("ipfs://" + metadata);
+    addRecentTransaction({
+      hash: tx.hash,
+      description: "Mint single nft",
+    });
+    const receipt = await tx.wait();
+    return receipt;
+  };
+
+  const mint = async (formData: FormProps) => {
+    const metadata = await toast.promise(getMetadata(formData), {
+      pending: "Pining to ipfs...",
+    });
+    nftMintAlert(sendTx(metadata));
+  };
+
+  interface FormProps {
+    name: string;
+    description: string;
+    image: File;
+  }
+
+  const handleSubmit = (formData: FormProps) => {
+    mint(formData);
   };
 
   return (
-    <FormContainer>
-      {/* <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          nftMintAlert(mint());
+    <FormContainer onSuccess={handleSubmit}>
+      <Container
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+          gap: 3,
         }}
-      > */}
-      <TextFieldElement label="Name" name="name" required />
-      <TextFieldElement label="Description" name="description" required />
-
-      {/* const InputFile = withStyles({
-  root: {
-    "& label.Mui-focused": {
-      color: "green",
-    },
-    "& .MuiInput-underline:after": {
-      borderBottomColor: "green",
-    },
-  },
-})(({ classes, ...props }) => {
-  return <MuiInputBase type="file" className={classes.root} {...props} />;
-}); */}
-
-      <Input
-        text="Image"
-        type="file"
-        id="nft_img"
-        className="w-full mb-8 text-sm"
-      />
-      {isConnected ? (
-        <div className="text-center">
-          <button className="submit-button">Create</button>
-        </div>
-      ) : (
-        <div className="flex">
-          <div className="mx-auto">
-            <ConnectButton />
-          </div>
-        </div>
-      )}
+        maxWidth="xs"
+      >
+        <TextFieldElement label="Name" name="name" required fullWidth />
+        <TextFieldElement label="Description" name="description" fullWidth />
+        <TextFieldElement
+          name="image"
+          type="file"
+          inputProps={{ accept: "image/*" }}
+          hidden
+          required
+          fullWidth
+        />
+        {isConnected ? (
+          <Button variant="contained" type="submit">
+            Submit
+          </Button>
+        ) : (
+          <ConnectButton />
+        )}
+      </Container>
     </FormContainer>
   );
 };

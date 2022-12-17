@@ -19,7 +19,7 @@ const basePromisePopup = (
   fn: Promise<any>,
   renderFn: (data: any) => ReactNode
 ) => {
-  toast.promise(
+  return toast.promise(
     fn,
     {
       pending: "Waiting for transaction...",
