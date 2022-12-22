@@ -9,6 +9,7 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
+import { BrowserRouter } from "react-router-dom";
 
 const { chains, provider } = configureChains(
   [chain.goerli],
@@ -59,7 +60,9 @@ root.render(
         showRecentTransactions={true}
       >
         <ThemeProvider theme={theme}>
-          <App />
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
         </ThemeProvider>
       </RainbowKitProvider>
     </WagmiConfig>

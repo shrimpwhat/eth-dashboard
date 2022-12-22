@@ -7,7 +7,7 @@ import {
   useContract,
   useSigner,
 } from "wagmi";
-import { TokenContext } from "../TokenPage";
+import { TokenContext } from "..";
 import erc20StakingFactoryAbi from "../../../utils/abi/ERC20StakingFactory";
 import erc20StakingAbi from "../../../utils/abi/ERC20Staking";
 import Input from "../../../utils/components/Input";

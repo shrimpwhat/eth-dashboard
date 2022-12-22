@@ -53,7 +53,7 @@ export default function FindContract({
           Find
         </Button>
       </Wrapper>
-      <Divider sx={{ my: 6 }} />
+      <Divider sx={{ my: 5 }} />
     </FormContainer>
   );
 }

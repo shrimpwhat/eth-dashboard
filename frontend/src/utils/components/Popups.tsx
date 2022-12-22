@@ -2,6 +2,8 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { ReactNode } from "react";
 import { ethers } from "ethers";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 export const errorAlert = (msg: string, id: string) => {
   toast.error(msg, {
@@ -30,7 +32,11 @@ const basePromisePopup = (
       },
       error: {
         render({ data }: any) {
-          return <p className="break-all">{data.message}</p>;
+          return (
+            <Typography sx={{ wordBreak: "break-all" }}>
+              {data.message}
+            </Typography>
+          );
         },
         closeOnClick: true,
       },
@@ -47,11 +53,13 @@ const basePromisePopup = (
 
 export const deployedCollectionAlert = (fn: Promise<string>) => {
   basePromisePopup(fn, (data: string) => (
-    <div>
-      <p>
+    <Box>
+      <Typography>
         Collection deployed at address:
         <br />
-        <span className="text-xs break-all text-black">{data}</span>
+        <Typography sx={{}} className="text-xs break-all text-black">
+          {data}
+        </Typography>
         <br />
         Go{" "}
         <Link
@@ -61,8 +69,8 @@ export const deployedCollectionAlert = (fn: Promise<string>) => {
           here
         </Link>{" "}
         to mint some nfts
-      </p>
-    </div>
+      </Typography>
+    </Box>
   ));
 };
 
@@ -118,4 +126,22 @@ export const nftMintAlert = (fn: Promise<ethers.ContractReceipt>) => {
       </ul>
     </div>
   ));
+};
+
+export const ipfsAlert = async (fn: Promise<string>) => {
+  return await toast.promise(fn, {
+    pending: "Pining to ipfs...",
+    error: {
+      render({ data }: any) {
+        return (
+          <Typography sx={{ wordBreak: "break-all" }}>
+            {data.message}
+          </Typography>
+        );
+      },
+      autoClose: 10000,
+      closeOnClick: true,
+      draggable: true,
+    },
+  });
 };

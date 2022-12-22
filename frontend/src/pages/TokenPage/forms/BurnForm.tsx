@@ -3,7 +3,7 @@ import Input from "../../../utils/components/Input";
 import { errorAlert, txAlert } from "../../../utils/components/Popups";
 import { useRef, ChangeEvent, FormEvent, useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { TokenContext } from "../TokenPage";
+import { TokenContext } from "..";
 
 const BurnForm = () => {
   const burnAmount = useRef("0");
