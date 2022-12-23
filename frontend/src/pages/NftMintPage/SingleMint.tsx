@@ -1,8 +1,8 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import NftMinterInterface from "../../utils/abi/NftMinter.json";
-import { useSigner, useContract, useAccount } from "wagmi";
+import { useSigner, useContract } from "wagmi";
 import { ChangeEvent, useEffect, useState } from "react";
 import { nftMintAlert, ipfsAlert } from "../../utils/components/Popups";
+import FieldsWrapper from "../../utils/components/FieldsWrapper";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import NodeFormData from "form-data";
 import axios from "axios";
@@ -14,13 +14,12 @@ import {
   useWatch,
 } from "react-hook-form-mui";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
+import SubmitButton from "../../utils/components/SubmitButton";
 
 interface FormProps {
   name: string;
@@ -31,7 +30,6 @@ interface FormProps {
 const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
 
 const MintSingleNft = () => {
-  const { isConnected } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
     address: process.env.REACT_APP_NFT_MINTER_ADDRESS as string,
@@ -137,15 +135,7 @@ const MintSingleNft = () => {
       }}
     >
       <FormContainer onSuccess={mint} formContext={context}>
-        <Container
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            gap: 3,
-          }}
-          maxWidth="xs"
-        >
+        <FieldsWrapper>
           <TextFieldElement label="Name" name="name" required fullWidth />
           <TextFieldElement label="Description" name="description" fullWidth />
           <TextFieldElement
@@ -159,14 +149,8 @@ const MintSingleNft = () => {
             required
             fullWidth
           />
-          {isConnected ? (
-            <Button variant="contained" type="submit">
-              Mint
-            </Button>
-          ) : (
-            <ConnectButton />
-          )}
-        </Container>
+          <SubmitButton text="Mint" />
+        </FieldsWrapper>
       </FormContainer>
       <NftPreview name={name} description={description} image={imageSrc} />
     </Box>
@@ -183,7 +167,7 @@ const NftPreview = ({
   image?: string;
 }) => {
   return (
-    <Card sx={{ maxWidth: 380 }} elevation={12}>
+    <Card sx={{ width: 380 }} elevation={12}>
       <CardMedia
         component="img"
         sx={{ maxHeight: 380, objectFit: "contain" }}
@@ -195,7 +179,11 @@ const NftPreview = ({
         <Typography gutterBottom variant="h5" component="div">
           {name ? name : "Nft name"}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ wordBreak: "break-word" }}
+        >
           {description
             ? description
             : "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo possimus eos eius commodi illo nemo repudiandae facere aliquam quos explicabo? Cum aliquam molestias at sit nesciunt, accusamus voluptatem suscipit odio."}

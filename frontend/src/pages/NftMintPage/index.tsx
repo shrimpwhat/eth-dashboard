@@ -7,11 +7,12 @@ import Typography from "@mui/material/Typography";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 
 export default function NftMintPage() {
   const [activeButton, setActiveButton] = useState(1);
   return (
-    <div className="text-xl">
+    <Box>
       <Typography variant="h5" mb={4}>
         Mint NFT
       </Typography>
@@ -41,7 +42,7 @@ export default function NftMintPage() {
           </Button>
         </ButtonGroup>
       </Container>
-      <div>{activeButton === 1 ? <MintSingleNft /> : <CreateCollection />}</div>
-    </div>
+      <Box>{activeButton === 1 ? <MintSingleNft /> : <CreateCollection />}</Box>
+    </Box>
   );
 }

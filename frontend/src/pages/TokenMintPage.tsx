@@ -1,16 +1,16 @@
-import Title from "../utils/components/Title";
-import Input from "../utils/components/Input";
 import FindContract from "../utils/components/FindContract";
-import { useAccount, useContract, useSigner } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useContract, useSigner } from "wagmi";
 import TokenFactoryAbi from "../utils/abi/TokenFactory.json";
-import { FormEvent } from "react";
 import { ethers } from "ethers";
 import { deployedTokenAlert } from "../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import Box from "@mui/material/Box";
+import { Typography } from "@mui/material";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import FieldsWrapper from "../utils/components/FieldsWrapper";
+import SubmitButton from "../utils/components/SubmitButton";
 
 export default function TokenCreationPage() {
-  const { isConnected } = useAccount();
   const { data: signer } = useSigner();
   const addRecentTransaction = useAddRecentTransaction();
 
@@ -20,18 +20,13 @@ export default function TokenCreationPage() {
     signerOrProvider: signer,
   });
 
-  const getTokenData = () => {
-    const name = (document.getElementById("token-name") as HTMLInputElement)
-      .value;
-    const symbol = (document.getElementById("token-symbol") as HTMLInputElement)
-      .value;
-    const supply = (document.getElementById("token-supply") as HTMLInputElement)
-      .value;
-    return { name, symbol, supply };
-  };
+  interface FormData {
+    name: string;
+    symbol: string;
+    supply: string;
+  }
 
-  const createToken = async () => {
-    const { name, symbol, supply } = getTokenData();
+  const createToken = async ({ name, symbol, supply }: FormData) => {
     const tx: ethers.ContractTransaction = await contract?.createToken(
       name,
       symbol,
@@ -46,36 +41,33 @@ export default function TokenCreationPage() {
     return tokenAddress;
   };
 
+  const handleSubmit = async (data: FormData) => {
+    deployedTokenAlert(createToken(data));
+  };
+
   return (
-    <div>
-      <Title text="Create Token" />
-      <div className="text-xl">
+    <Box>
+      <Typography variant="h5" mb={4}>
+        Create Token
+      </Typography>
+      <Box>
         <FindContract url="/token/" text={"Token address"} />
-        <form
-          onSubmit={(e: FormEvent) => {
-            e.preventDefault();
-            deployedTokenAlert(createToken());
-          }}
-        >
-          <div className="flex flex-col items-center w-1/3 mx-auto">
-            <Input text="Name" id="token-name" className="mb-8" />
-            <Input text="Symbol" id="token-symbol" className="mb-8" />
-            <Input
-              text="Initial supply"
-              id="token-supply"
+        <FormContainer onSuccess={handleSubmit}>
+          <FieldsWrapper>
+            <TextFieldElement label="Name" name="name" required fullWidth />
+            <TextFieldElement label="Symbol" name="symbol" required fullWidth />
+            <TextFieldElement
+              label="Initial supply"
+              name="supply"
               type="number"
-              min={0}
-              step={1e-18}
-              className="mb-8"
+              inputProps={{ step: 1e-18, min: 0 }}
+              required
+              fullWidth
             />
-            {isConnected ? (
-              <button className="submit-button">Create</button>
-            ) : (
-              <ConnectButton />
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
+            <SubmitButton text="Create" />
+          </FieldsWrapper>
+        </FormContainer>
+      </Box>
+    </Box>
   );
 }

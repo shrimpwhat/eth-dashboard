@@ -8,8 +8,8 @@ import { ethers } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
+import FieldsWrapper from "../../utils/components/FieldsWrapper";
+import SubmitButton from "../../utils/components/SubmitButton";
 
 const contractAddress = process.env.REACT_APP_NFT_FACTORY_ADDRESS as string;
 
@@ -64,15 +64,7 @@ const CreateCollection = () => {
 
   return (
     <FormContainer onSuccess={handleSubmit}>
-      <Container
-        maxWidth="sm"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
+      <FieldsWrapper>
         <TextFieldElement name="name" label="Name" required fullWidth />
         <TextFieldElement name="symbol" label="Symbol" required fullWidth />
         <TextFieldElement
@@ -112,10 +104,8 @@ const CreateCollection = () => {
             },
           }}
         />
-        <Button type="submit" variant="contained">
-          Create
-        </Button>
-      </Container>
+        <SubmitButton text="Create" />
+      </FieldsWrapper>
     </FormContainer>
   );
 };
