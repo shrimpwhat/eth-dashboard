@@ -1,9 +1,25 @@
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { ReactNode } from "react";
 import { ethers } from "ethers";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import { ListItemButton } from "@mui/material";
+
+const Address = ({ data }: { data: string }) => {
+  return (
+    <Typography
+      sx={{ wordBreak: "break-all", color: "black" }}
+      variant="subtitle2"
+      component="span"
+    >
+      {data}
+    </Typography>
+  );
+};
 
 export const errorAlert = (msg: string, id: string) => {
   toast.error(msg, {
@@ -57,15 +73,10 @@ export const deployedCollectionAlert = (fn: Promise<string>) => {
       <Typography>
         Collection deployed at address:
         <br />
-        <Typography sx={{}} className="text-xs break-all text-black">
-          {data}
-        </Typography>
+        <Address data={data} />
         <br />
         Go{" "}
-        <Link
-          to={"/nft/collection/" + data}
-          className="text-blue-600 underline"
-        >
+        <Link component={RouterLink} to={"/nft/" + data}>
           here
         </Link>{" "}
         to mint some nfts
@@ -76,55 +87,57 @@ export const deployedCollectionAlert = (fn: Promise<string>) => {
 
 export const deployedTokenAlert = (fn: Promise<string>) => {
   basePromisePopup(fn, (data: string) => (
-    <div>
-      <p>
+    <Box>
+      <Typography>
         Token deployed at address:
         <br />
-        <span className="text-xs break-all text-black">{data}</span>
+        <Address data={data} />
         <br />
-        <Link to={"/token/" + data} className="text-blue-600 underline">
+        <Link to={"/token/" + data} component={RouterLink}>
           Token Page
         </Link>
-      </p>
-    </div>
+      </Typography>
+    </Box>
   ));
 };
 
 export const txAlert = (text: string, fn: Promise<any>) => {
   basePromisePopup(fn, (data: string) => (
-    <div>
-      <p>{text}</p>
-      <a
+    <Box>
+      <Typography variant="body2">{text}</Typography>
+      <Link
         target="_blank"
         rel="noreferrer"
         href={`https://goerli.etherscan.io/tx/${data}`}
-        className="text-blue-600 underline"
       >
         View on Etherscan
-      </a>
-    </div>
+      </Link>
+    </Box>
   ));
 };
 
 export const nftMintAlert = (fn: Promise<ethers.ContractReceipt>) => {
   basePromisePopup(fn, (data: ethers.ContractReceipt) => (
-    <div>
-      <p>Nft successfuly minted! Check it at Opensea:</p>
-      <ul>
+    <Box>
+      <Typography variant="body2">
+        Nft successfuly minted! Check it at Opensea:
+      </Typography>
+      <List>
         {data?.events?.map((event: ethers.Event, index: number) => (
-          <li key={index}>
-            <a
+          <ListItem key={index} disablePadding>
+            <ListItemButton
+              component={Link}
               target="_blank"
               rel="noreferrer"
               href={`https://testnets.opensea.io/assets/goerli/${data?.to}/${event?.args?.tokenId}`}
-              className="text-blue-600 underline"
+              sx={{ color: "primary.main" }}
             >
-              Link
-            </a>
-          </li>
+              {`Token #${event?.args?.tokenId}`}
+            </ListItemButton>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   ));
 };
 

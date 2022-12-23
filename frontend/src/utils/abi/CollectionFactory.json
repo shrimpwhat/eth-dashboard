@@ -31,14 +31,14 @@
         "type": "string"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "maxUserLimit",
-        "type": "uint32"
+        "type": "uint256"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "maxSupply",
-        "type": "uint32"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",

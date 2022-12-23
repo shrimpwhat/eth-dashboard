@@ -52,9 +52,14 @@ const CreateCollection = () => {
   };
 
   const handleSubmit = async (data: FormData) => {
-    if (isConnected) {
-      deployedCollectionAlert(createCollection(data));
-    } else errorAlert("Connect your wallet first!", "wallet-connect");
+    if (!isConnected)
+      errorAlert("Connect your wallet first!", "wallet-connect");
+    else if (Number(data.supply) < Number(data.limit))
+      errorAlert(
+        "Collection supply can't be lower than the user limit",
+        "insufficient-supply"
+      );
+    else deployedCollectionAlert(createCollection(data));
   };
 
   return (
@@ -102,13 +107,13 @@ const CreateCollection = () => {
           type="url"
           validation={{
             pattern: {
-              value: /^ipfs:\/\/[a-zA-Z0-9]{46}\/?$/,
-              message: "Please provide a valid IPFS URI",
+              value: /^(ipfs:\/\/[a-zA-Z0-9]{46}|https:\/\/.+)\/?$/,
+              message: "Please provide a valid IPFS or HTTPS URI",
             },
           }}
         />
         <Button type="submit" variant="contained">
-          Submit
+          Create
         </Button>
       </Container>
     </FormContainer>

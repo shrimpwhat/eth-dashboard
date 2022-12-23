@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useContract, useSigner, useAccount, useProvider } from "wagmi";
 import Title from "../utils/components/Title";
-import Collection from "../utils/abi/ERC721.json";
+import Collection from "../utils/abi/Collection.json";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { nftMintAlert, txAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";

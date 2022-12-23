@@ -12,14 +12,14 @@
         "type": "string"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "_MAX_USER_LIMIT",
-        "type": "uint32"
+        "type": "uint256"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "_MAX_SUPPLY",
-        "type": "uint32"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -235,9 +235,9 @@
     "name": "MAX_SUPPLY",
     "outputs": [
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "",
-        "type": "uint32"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -248,9 +248,9 @@
     "name": "MAX_USER_LIMIT",
     "outputs": [
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "",
-        "type": "uint32"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
