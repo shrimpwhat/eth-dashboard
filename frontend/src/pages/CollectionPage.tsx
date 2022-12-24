@@ -1,15 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useContract, useSigner, useAccount, useProvider } from "wagmi";
-import Title from "../utils/components/Title";
 import Collection from "../utils/abi/Collection.json";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { nftMintAlert, txAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
+import Chip from "@mui/material/Chip";
 
 interface CollectionInfo {
   name: string;
@@ -23,7 +24,7 @@ interface CollectionInfo {
 }
 
 export default function CollectionPage() {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { address: contractAddress } = useParams();
   const provider = useProvider({ chainId: 5 });
   const { data: signer } = useSigner();
@@ -122,7 +123,7 @@ export default function CollectionPage() {
         <Typography variant="h5" gutterBottom>
           Nft minting page
         </Typography>
-        <Typography variant="h5">
+        <Typography variant="h5" sx={{ mt: "35vh" }}>
           Fetching data
           <CircularProgress size="30px" sx={{ ml: 2 }} />
         </Typography>
@@ -131,104 +132,117 @@ export default function CollectionPage() {
   else
     return (
       <Box>
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h5" mb="25px">
           Nft minting page
         </Typography>
-        <div className="card">
-          <h2 className="text-3xl mt-3">{collectionInfo.name}</h2>
-          <p className="mt-4 text-xl">
-            <span className="text-purple-600">
-              {collectionInfo.maxSupply - collectionInfo.totalMinted}
-            </span>
-            /
-            <span className="text-fuchsia-900">{collectionInfo.maxSupply}</span>{" "}
-            Available
-          </p>
-          <p className="mt-4 text-xl">
-            <strong>
-              {ethers.utils.formatEther(collectionInfo.price)} ETH
-            </strong>{" "}
-            per token
-          </p>
-          <div className="text-center">
-            {collectionInfo.userMintedAmount < collectionInfo.userLimit ? (
-              <>
-                <p className="mt-4 text-xl">
-                  You can mint{" "}
-                  <span className="text-rose-800">
-                    {collectionInfo.userLimit - collectionInfo.userMintedAmount}
-                  </span>{" "}
-                  more nfts
-                </p>
-                <form
-                  className="mt-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    nftMintAlert(mint());
-                  }}
-                >
-                  <label htmlFor="mint-amount" className="mr-3 text-xl">
-                    Amount to mint
-                  </label>
-                  <input
-                    type="number"
-                    id="mint-amount"
-                    max={
-                      collectionInfo.userLimit - collectionInfo.userMintedAmount
-                    }
-                    min="1"
-                    required
-                    className="border border-black rounded p-1"
-                    onChange={(e) => {
-                      mintAmount.current = Number(e.target.value);
-                    }}
-                  />
-                  <p
-                    className="inline-block ml-2 underline text-blue-600 cursor-pointer"
-                    onClick={() => {
-                      const value =
-                        collectionInfo.userLimit -
-                        collectionInfo.userMintedAmount;
-                      const input = document.getElementById(
-                        "mint-amount"
-                      ) as HTMLInputElement;
-                      input.value = value.toString();
-                      mintAmount.current = value;
+        <Container maxWidth="sm">
+          <Paper elevation={3} sx={{ padding: "20px" }}>
+            <Typography
+              variant="h6"
+              textAlign="center"
+              sx={{ fontWeight: "bold" }}
+              gutterBottom
+            >
+              {collectionInfo.name}
+            </Typography>
+            <Typography textAlign="center" variant="body2">
+              <Chip label="primary" />
+              <Typography component="span">
+                {collectionInfo.maxSupply - collectionInfo.totalMinted}
+              </Typography>
+              /
+              <Typography component="span">
+                {collectionInfo.maxSupply}
+              </Typography>
+            </Typography>
+            <p className="mt-4 text-xl">
+              <strong>
+                {ethers.utils.formatEther(collectionInfo.price)} ETH
+              </strong>{" "}
+              per token
+            </p>
+            <div className="text-center">
+              {collectionInfo.userMintedAmount < collectionInfo.userLimit ? (
+                <>
+                  <p className="mt-4 text-xl">
+                    You can mint{" "}
+                    <span className="text-rose-800">
+                      {collectionInfo.userLimit -
+                        collectionInfo.userMintedAmount}
+                    </span>{" "}
+                    more nfts
+                  </p>
+                  <form
+                    className="mt-4"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      nftMintAlert(mint());
                     }}
                   >
-                    Max
-                  </p>
-                  <button className="block mx-auto my-5 text-xl font-bold border border-black rounded px-4 py-2 bg-purple-200">
-                    Mint
+                    <label htmlFor="mint-amount" className="mr-3 text-xl">
+                      Amount to mint
+                    </label>
+                    <input
+                      type="number"
+                      id="mint-amount"
+                      max={
+                        collectionInfo.userLimit -
+                        collectionInfo.userMintedAmount
+                      }
+                      min="1"
+                      required
+                      className="border border-black rounded p-1"
+                      onChange={(e) => {
+                        mintAmount.current = Number(e.target.value);
+                      }}
+                    />
+                    <p
+                      className="inline-block ml-2 underline text-blue-600 cursor-pointer"
+                      onClick={() => {
+                        const value =
+                          collectionInfo.userLimit -
+                          collectionInfo.userMintedAmount;
+                        const input = document.getElementById(
+                          "mint-amount"
+                        ) as HTMLInputElement;
+                        input.value = value.toString();
+                        mintAmount.current = value;
+                      }}
+                    >
+                      Max
+                    </p>
+                    <button className="block mx-auto my-5 text-xl font-bold border border-black rounded px-4 py-2 bg-purple-200">
+                      Mint
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <p className="text-center text-2xl my-4">
+                  You have already minted max amount
+                </p>
+              )}
+              {collectionInfo.owner === address && (
+                <div>
+                  <h1>
+                    Contract balance is{" "}
+                    <span className="font-bold">
+                      {collectionInfo.contractBalance}
+                    </span>{" "}
+                    ETH
+                  </h1>
+                  <button
+                    className="block mx-auto my-5 text-lg border border-black rounded px-3 py-1 duration-500 hover:bg-black hover:text-white"
+                    onClick={() => {
+                      txAlert("Funds successfuly withdrawn!", withdraw());
+                    }}
+                  >
+                    Withdraw
                   </button>
-                </form>
-              </>
-            ) : (
-              <p className="text-center text-2xl my-4">
-                You have already minted max amount
-              </p>
-            )}
-            {collectionInfo.owner === address && (
-              <div>
-                <h1>
-                  Contract balance is{" "}
-                  <span className="font-bold">
-                    {collectionInfo.contractBalance}
-                  </span>{" "}
-                  ETH
-                </h1>
-                <button
-                  className="block mx-auto my-5 text-lg border border-black rounded px-3 py-1 duration-500 hover:bg-black hover:text-white"
-                  onClick={() => {
-                    txAlert("Funds successfuly withdrawn!", withdraw());
-                  }}
-                >
-                  Withdraw
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+                </div>
+              )}
+            </div>
+          </Paper>
+        </Container>
       </Box>
     );
 }
