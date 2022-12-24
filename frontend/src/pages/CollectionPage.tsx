@@ -7,6 +7,9 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { nftMintAlert, txAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface CollectionInfo {
   name: string;
@@ -113,10 +116,24 @@ export default function CollectionPage() {
     return receipt.transactionHash;
   };
 
-  return (
-    <div>
-      <Title text="Nft minting page" />
-      {isFetched && isConnected ? (
+  if (!isFetched)
+    return (
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Nft minting page
+        </Typography>
+        <Typography variant="h5">
+          Fetching data
+          <CircularProgress size="30px" sx={{ ml: 2 }} />
+        </Typography>
+      </Box>
+    );
+  else
+    return (
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Nft minting page
+        </Typography>
         <div className="card">
           <h2 className="text-3xl mt-3">{collectionInfo.name}</h2>
           <p className="mt-4 text-xl">
@@ -212,19 +229,6 @@ export default function CollectionPage() {
             )}
           </div>
         </div>
-      ) : (
-        <>
-          {!address ? (
-            <div className="flex">
-              <div className="mx-auto">
-                <ConnectButton />
-              </div>
-            </div>
-          ) : (
-            <p className="text-center text-2xl font-bold">Fetching data...</p>
-          )}
-        </>
-      )}
-    </div>
-  );
+      </Box>
+    );
 }
