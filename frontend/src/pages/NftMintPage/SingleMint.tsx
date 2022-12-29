@@ -1,4 +1,4 @@
-import NftMinterInterface from "../../utils/abi/NftMinter.json";
+import NftMinterInterface from "../../utils/abi/NftMinter";
 import { useSigner, useContract } from "wagmi";
 import { ChangeEvent, useEffect, useState } from "react";
 import { nftMintAlert, ipfsAlert } from "../../utils/components/Popups";
@@ -20,6 +20,7 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import SubmitButton from "../../utils/components/SubmitButton";
+import { ethers } from "ethers";
 
 interface FormProps {
   name: string;
@@ -28,7 +29,6 @@ interface FormProps {
 }
 
 const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
-
 const MintSingleNft = () => {
   const { data: signer } = useSigner();
   const contract = useContract({
@@ -59,7 +59,7 @@ const MintSingleNft = () => {
       {
         headers: {
           "Content-Type": `multipart/form-data; boundary=${formData.getBoundary}`,
-          Authorization: `Bearer ${process.env.REACT_APP_PINATA_JWT_KEY}`,
+          Authorization: `Bearer ${PINATA_JWT}`,
         },
       }
     );
@@ -99,19 +99,19 @@ const MintSingleNft = () => {
     return metadata;
   };
 
-  const sendTx = async (metadata: string) => {
+  const writeContract = async (metadata: string) => {
     const tx = await contract?.mint("ipfs://" + metadata);
     addRecentTransaction({
-      hash: tx.hash,
+      hash: tx?.hash ?? ethers.constants.HashZero,
       description: "Mint single nft",
     });
-    const receipt = await tx.wait();
-    return receipt;
+    const receipt = await tx?.wait();
+    return receipt as ethers.ContractReceipt;
   };
 
   const mint = async (formData: FormProps) => {
     const metadata = await ipfsAlert(getMetadata(formData));
-    nftMintAlert(sendTx(metadata));
+    nftMintAlert(writeContract(metadata));
   };
 
   useEffect(() => {
@@ -167,7 +167,7 @@ const NftPreview = ({
   image?: string;
 }) => {
   return (
-    <Card sx={{ width: 380 }} elevation={12}>
+    <Card sx={{ maxWidth: 380 }} elevation={12}>
       <CardMedia
         component="img"
         sx={{ maxHeight: 380, objectFit: "contain" }}

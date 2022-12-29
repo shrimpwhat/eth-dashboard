@@ -7,7 +7,7 @@ export default function SubmitButton({ text }: { text: string }) {
   return (
     <>
       {isConnected ? (
-        <Button variant="contained" type="submit">
+        <Button variant="contained" type="submit" size="large">
           {text}
         </Button>
       ) : (

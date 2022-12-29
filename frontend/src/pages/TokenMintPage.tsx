@@ -1,6 +1,6 @@
 import FindContract from "../utils/components/FindContract";
 import { useContract, useSigner } from "wagmi";
-import TokenFactoryAbi from "../utils/abi/TokenFactory.json";
+import TokenFactoryAbi from "../utils/abi/TokenFactory";
 import { ethers } from "ethers";
 import { deployedTokenAlert } from "../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -27,17 +27,17 @@ export default function TokenCreationPage() {
   }
 
   const createToken = async ({ name, symbol, supply }: FormData) => {
-    const tx: ethers.ContractTransaction = await contract?.createToken(
+    const tx = await contract?.createToken(
       name,
       symbol,
       ethers.utils.parseEther(supply)
     );
     addRecentTransaction({
-      hash: tx.hash,
+      hash: tx?.hash ?? ethers.constants.HashZero,
       description: `Create token ${name}`,
     });
-    const receipt = await tx.wait();
-    const tokenAddress = receipt.events?.at(3)?.args?.tokenAddress;
+    const receipt = await tx?.wait();
+    const tokenAddress = receipt?.events?.at(3)?.args?.tokenAddress;
     return tokenAddress;
   };
 

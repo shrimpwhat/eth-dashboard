@@ -45,7 +45,7 @@ contract Collection is ERC721A, Ownable {
         return _totalMinted();
     }
 
-    function mint(uint16 amount) external payable callerIsUser {
+    function mint(uint256 amount) external payable callerIsUser {
         require(
             _numberMinted(msg.sender) + amount <= MAX_USER_LIMIT,
             "Exceded max mint limit"

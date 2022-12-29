@@ -90,7 +90,7 @@ const App = () => {
             Web3 Dev Dashboard
           </Typography>
           {!matches && (
-            <Box sx={{ ml: "auto" }}>
+            <Box sx={{ ml: "auto", maxWidth: "min-content" }}>
               <ConnectButton chainStatus="none" />
             </Box>
           )}

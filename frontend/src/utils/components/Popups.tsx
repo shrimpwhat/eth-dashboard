@@ -13,7 +13,7 @@ const Address = ({ data }: { data: string }) => {
   return (
     <Typography
       sx={{ wordBreak: "break-all", color: "black" }}
-      variant="subtitle2"
+      variant="body1"
       component="span"
     >
       {data}
@@ -62,7 +62,7 @@ const basePromisePopup = (
       hideProgressBar: false,
       closeOnClick: false,
       autoClose: 10000,
-      draggable: true,
+      draggable: false,
     }
   );
 };
@@ -75,9 +75,8 @@ export const deployedCollectionAlert = (fn: Promise<string>) => {
         <br />
         <Address data={data} />
         <br />
-        Go{" "}
         <Link component={RouterLink} to={"/nft/" + data}>
-          here
+          Go here
         </Link>{" "}
         to mint some nfts
       </Typography>
@@ -86,7 +85,7 @@ export const deployedCollectionAlert = (fn: Promise<string>) => {
 };
 
 export const deployedTokenAlert = (fn: Promise<string>) => {
-  basePromisePopup(fn, (data: string) => (
+  return basePromisePopup(fn, (data: string) => (
     <Box>
       <Typography>
         Token deployed at address:
@@ -141,13 +140,13 @@ export const nftMintAlert = (fn: Promise<ethers.ContractReceipt>) => {
   ));
 };
 
-export const ipfsAlert = async (fn: Promise<string>) => {
+export const ipfsAlert = async (fn: Promise<any>) => {
   return await toast.promise(fn, {
     pending: "Pining to ipfs...",
     error: {
       render({ data }: any) {
         return (
-          <Typography sx={{ wordBreak: "break-all" }}>
+          <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
             {data.message}
           </Typography>
         );

@@ -1,7 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
-import { useContract, useSigner, useAccount, useProvider } from "wagmi";
-import Collection from "../utils/abi/Collection.json";
+import {
+  useContract,
+  useSigner,
+  useAccount,
+  useNetwork,
+  useContractReads,
+  useBalance,
+} from "wagmi";
+import Collection from "../utils/abi/Collection";
 import { nftMintAlert, txAlert } from "../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -9,115 +15,129 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
-import Paper from "@mui/material/Paper";
 import Chip from "@mui/material/Chip";
-
-interface CollectionInfo {
-  name: string;
-  price: BigNumber;
-  userLimit: number;
-  maxSupply: number;
-  totalMinted: number;
-  userMintedAmount: number;
-  owner: string;
-  contractBalance: string;
-}
+import Stack from "@mui/material/Stack";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import Button from "@mui/material/Button";
+import SubmitButton from "../utils/components/SubmitButton";
+import FieldsWrapper from "../utils/components/FieldsWrapper";
+import Divider from "@mui/material/Divider";
 
 export default function CollectionPage() {
   const { address } = useAccount();
-  const { address: contractAddress } = useParams();
-  const provider = useProvider({ chainId: 5 });
+  const { address: contractAddress } = useParams<{ address: `0x${string}` }>();
   const { data: signer } = useSigner();
+  const { chain } = useNetwork();
+
+  const contractData = { address: contractAddress as string, abi: Collection };
   const contract = useContract({
-    address: contractAddress as string,
-    abi: Collection,
+    ...contractData,
     signerOrProvider: signer,
   });
-  const mintAmount = useRef(1);
   const addRecentTransaction = useAddRecentTransaction();
 
-  const [collectionInfo, updateInfo]: [CollectionInfo, Function] = useState({
-    name: "",
-    price: BigNumber.from(0),
-    userLimit: 0,
-    maxSupply: 0,
-    totalMinted: 0,
-    userMintedAmount: 0,
-    owner: "",
-    contractBalance: "0",
+  const formContext = useForm<{ amount: string }>();
+
+  const {
+    data: collectionInfo,
+    isFetched,
+    refetch,
+  } = useContractReads({
+    contracts: [
+      {
+        ...contractData,
+        functionName: "name",
+      },
+      {
+        ...contractData,
+        functionName: "TOKEN_PRICE",
+      },
+      {
+        ...contractData,
+        functionName: "MAX_USER_LIMIT",
+      },
+      {
+        ...contractData,
+        functionName: "totalMinted",
+      },
+      {
+        ...contractData,
+        functionName: "MAX_SUPPLY",
+      },
+      {
+        ...contractData,
+        functionName: "numberMinted",
+        args: [address ?? ethers.constants.AddressZero],
+      },
+      {
+        ...contractData,
+        functionName: "owner",
+      },
+    ],
+    select: (data) => {
+      return {
+        name: data[0],
+        price: data[1],
+        userLimit: Number(data[2]),
+        totalMinted: Number(data[3]),
+        maxSupply: Number(data[4]),
+        userMintedAmount: Number(data[5]),
+        owner: data[6],
+      };
+    },
   });
-  const [isFetched, setFetchStatus] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      if (contract && signer) {
-        const name = await contract.name();
-        const price = await contract.TOKEN_PRICE();
-        const userLimit = Number(await contract.MAX_USER_LIMIT());
-        const totalMinted = Number(await contract.totalMinted());
-        const maxSupply = Number(await contract.MAX_SUPPLY());
-        const userMintedAmount = Number(await contract.numberMinted(address));
-        const owner = await contract.owner();
-        const contractBalance = ethers.utils.formatEther(
-          await provider.getBalance(contractAddress as string)
-        );
-        updateInfo({
-          name,
-          price,
-          userLimit,
-          totalMinted,
-          maxSupply,
-          userMintedAmount,
-          owner,
-          contractBalance,
-        });
-        setFetchStatus(true);
-      }
-    })();
-  }, [contract, signer, address, contractAddress, provider]);
+  const { data: contractBalance, refetch: refetchBalance } = useBalance({
+    address: contractAddress,
+  });
 
-  const updateInfoAfterMint = async () => {
-    const totalMinted = Number(await contract?.totalMinted());
-    const userMintedAmount = Number(await contract?.numberMinted(address));
-    const contractBalance = ethers.utils.formatEther(
-      await provider.getBalance(contractAddress as string)
-    );
-    updateInfo({
-      ...collectionInfo,
-      totalMinted,
-      userMintedAmount,
-      contractBalance,
-    });
+  const checkAmount = (mintAmount: Number) => {
+    if (collectionInfo) {
+      if (mintAmount > collectionInfo.maxSupply - collectionInfo.totalMinted)
+        throw new Error("Not enough tokens left");
+      else if (
+        mintAmount >
+        collectionInfo.userLimit - collectionInfo.userMintedAmount
+      )
+        throw new Error("Amount is greater than your limit");
+    }
   };
 
-  const mint = async () => {
-    const tx = await contract?.mint(mintAmount.current, {
-      value: collectionInfo.price.mul(mintAmount.current).toString(),
+  const mint = async ({ amount }: { amount: string }) => {
+    const mintAmount = Number(amount);
+    checkAmount(mintAmount);
+    const tx = await contract?.mint(BigNumber.from(mintAmount), {
+      value: collectionInfo?.price.mul(mintAmount),
     });
     addRecentTransaction({
-      hash: tx.hash,
-      description: `Mint ${mintAmount.current} tokens of ${collectionInfo.name}`,
+      hash: tx?.hash ?? "",
+      description: `Mint ${mintAmount} tokens of ${collectionInfo?.name}`,
     });
-    const receipt = await tx.wait();
-    updateInfoAfterMint();
-    return receipt;
+    const receipt = await tx?.wait();
+    refetch();
+    refetchBalance();
+    return receipt as ethers.ContractReceipt;
   };
 
   const withdraw = async () => {
     const tx = await contract?.withdraw();
-    const receipt = await tx.wait();
-    console.log(receipt.transactionHash);
-    const contractBalance = ethers.utils.formatEther(
-      await provider.getBalance(contractAddress as string)
-    );
-    updateInfo({
-      ...collectionInfo,
-      contractBalance,
-    });
-    return receipt.transactionHash;
+    const receipt = await tx?.wait();
+    refetchBalance();
+    return receipt?.transactionHash;
   };
 
-  if (!isFetched)
+  const setMaxAmount = () => {
+    if (collectionInfo)
+      formContext.setValue(
+        "amount",
+        Math.min(
+          collectionInfo.userLimit - collectionInfo.userMintedAmount,
+          collectionInfo.maxSupply - collectionInfo.totalMinted
+        ).toString()
+      );
+  };
+
+  if (!isFetched || !contract || !collectionInfo)
     return (
       <Box>
         <Typography variant="h5" gutterBottom>
@@ -135,113 +155,114 @@ export default function CollectionPage() {
         <Typography variant="h5" mb="25px">
           Nft minting page
         </Typography>
-        <Container maxWidth="sm">
-          <Paper elevation={3} sx={{ padding: "20px" }}>
+        <Container maxWidth="sm" sx={{ border: "1px solid black", p: 2 }}>
+          <Stack textAlign={"center"} gap={2}>
             <Typography
-              variant="h6"
+              variant="h4"
               textAlign="center"
               sx={{ fontWeight: "bold" }}
-              gutterBottom
             >
-              {collectionInfo.name}
+              {collectionInfo?.name}
             </Typography>
-            <Typography textAlign="center" variant="body2">
-              <Chip label="primary" />
-              <Typography component="span">
-                {collectionInfo.maxSupply - collectionInfo.totalMinted}
-              </Typography>
-              /
-              <Typography component="span">
-                {collectionInfo.maxSupply}
-              </Typography>
-            </Typography>
-            <p className="mt-4 text-xl">
-              <strong>
-                {ethers.utils.formatEther(collectionInfo.price)} ETH
-              </strong>{" "}
+            <Box>
+              <Chip
+                label={`${
+                  collectionInfo.maxSupply - collectionInfo.totalMinted
+                }/${collectionInfo.maxSupply}`}
+                color="primary"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+              />
+            </Box>
+            <Typography variant="h6">
+              <Box component="span" color="#880e4f" fontWeight="bold">
+                {ethers.utils.formatEther(collectionInfo.price ?? 0)}{" "}
+                {chain?.nativeCurrency?.symbol}
+              </Box>{" "}
               per token
-            </p>
-            <div className="text-center">
-              {collectionInfo.userMintedAmount < collectionInfo.userLimit ? (
-                <>
-                  <p className="mt-4 text-xl">
-                    You can mint{" "}
-                    <span className="text-rose-800">
-                      {collectionInfo.userLimit -
-                        collectionInfo.userMintedAmount}
-                    </span>{" "}
-                    more nfts
-                  </p>
-                  <form
-                    className="mt-4"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      nftMintAlert(mint());
-                    }}
+            </Typography>
+            {collectionInfo.userMintedAmount < collectionInfo.userLimit ? (
+              <>
+                <Typography variant="h6">
+                  Your limit is
+                  <Box
+                    component="span"
+                    fontStyle={"italic"}
+                    fontWeight="bold"
+                    color="#304ffe"
                   >
-                    <label htmlFor="mint-amount" className="mr-3 text-xl">
-                      Amount to mint
-                    </label>
-                    <input
-                      type="number"
-                      id="mint-amount"
-                      max={
-                        collectionInfo.userLimit -
-                        collectionInfo.userMintedAmount
-                      }
-                      min="1"
-                      required
-                      className="border border-black rounded p-1"
-                      onChange={(e) => {
-                        mintAmount.current = Number(e.target.value);
-                      }}
-                    />
-                    <p
-                      className="inline-block ml-2 underline text-blue-600 cursor-pointer"
-                      onClick={() => {
-                        const value =
-                          collectionInfo.userLimit -
-                          collectionInfo.userMintedAmount;
-                        const input = document.getElementById(
-                          "mint-amount"
-                        ) as HTMLInputElement;
-                        input.value = value.toString();
-                        mintAmount.current = value;
-                      }}
-                    >
-                      Max
-                    </p>
-                    <button className="block mx-auto my-5 text-xl font-bold border border-black rounded px-4 py-2 bg-purple-200">
-                      Mint
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <p className="text-center text-2xl my-4">
-                  You have already minted max amount
-                </p>
-              )}
-              {collectionInfo.owner === address && (
-                <div>
-                  <h1>
-                    Contract balance is{" "}
-                    <span className="font-bold">
-                      {collectionInfo.contractBalance}
-                    </span>{" "}
-                    ETH
-                  </h1>
-                  <button
-                    className="block mx-auto my-5 text-lg border border-black rounded px-3 py-1 duration-500 hover:bg-black hover:text-white"
+                    {" "}
+                    {Math.min(
+                      collectionInfo.userLimit -
+                        collectionInfo.userMintedAmount,
+                      collectionInfo.maxSupply - collectionInfo.totalMinted
+                    )}{" "}
+                  </Box>
+                  more nfts
+                </Typography>
+                {collectionInfo.maxSupply - collectionInfo.totalMinted === 0 ? (
+                  <Typography
+                    variant="h6"
+                    color="primary.main"
+                    fontWeight="bold"
+                  >
+                    All tokens have been minted!
+                  </Typography>
+                ) : (
+                  <FormContainer
+                    formContext={formContext}
+                    onSuccess={(data) => nftMintAlert(mint(data))}
+                  >
+                    <FieldsWrapper>
+                      <Box display="flex" justifyContent="center" width="100%">
+                        <TextFieldElement
+                          label="Amount to mint"
+                          name="amount"
+                          type="number"
+                          fullWidth
+                          sx={{ minWidth: "110px" }}
+                          inputProps={{
+                            min: 1,
+                            max:
+                              collectionInfo.userLimit -
+                              collectionInfo.userMintedAmount,
+                          }}
+                        />
+                        <Button variant="outlined" onClick={setMaxAmount}>
+                          Max
+                        </Button>
+                      </Box>
+                      <SubmitButton text="Mint" />
+                    </FieldsWrapper>
+                  </FormContainer>
+                )}
+              </>
+            ) : (
+              <Typography variant="h6" color="primary.main" fontWeight="bold">
+                You have already minted max amount!
+              </Typography>
+            )}
+            {collectionInfo.owner === address && (
+              <>
+                <Divider />
+                <Typography variant="h6">
+                  Contract balance:{" "}
+                  <Box component="span" fontWeight="bold">
+                    {contractBalance?.formatted} {contractBalance?.symbol}
+                  </Box>
+                </Typography>
+                <Box>
+                  <Button
                     onClick={() => {
                       txAlert("Funds successfuly withdrawn!", withdraw());
                     }}
+                    variant="outlined"
                   >
                     Withdraw
-                  </button>
-                </div>
-              )}
-            </div>
-          </Paper>
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Stack>
         </Container>
       </Box>
     );
