@@ -21,7 +21,7 @@ function App() {
               <li className="mb-5">
                 <Link to="/">Home</Link>
               </li>
-              <li>
+              <li className="mb-5">
                 <Link to="/nft">Mint NFT</Link>
               </li>
               <li>
