@@ -11,13 +11,7 @@ import abi from "../../utils/abi/ERC20";
 import Title from "../../utils/components/Title";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { createContext } from "react";
-import {
-  TransferForm,
-  MintForm,
-  ApproveForm,
-  BurnForm,
-  StakingForm,
-} from "./forms";
+import { TransferForm, MintForm, ApproveForm, BurnForm } from "./forms";
 
 interface TokenProps {
   address?: string;
@@ -116,7 +110,6 @@ export default function TokenPage() {
             <TransferForm />
             <ApproveForm />
             <BurnForm />
-            <StakingForm />
           </TokenContext.Provider>
         </div>
       </div>

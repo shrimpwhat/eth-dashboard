@@ -24,14 +24,8 @@ function App() {
               <li>
                 <Link to="/nft">Mint NFT</Link>
               </li>
-              <li className="my-5">
-                <Link to="">NFT staking</Link>
-              </li>
               <li>
                 <Link to="/token/create">ERC20</Link>
-              </li>
-              <li className="my-5">
-                <Link to="">Swap</Link>
               </li>
             </ul>
           </nav>
