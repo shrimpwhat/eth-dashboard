@@ -42,13 +42,12 @@ export default function FindContract({
           helperText="Find already deployed contract"
           parseError={() => "Not an ethereum address!"}
           fullWidth
-          inputProps={{ sx: { height: "50px", boxSizing: "border-box" } }}
           validation={{ validate: (s) => ethers.utils.isAddress(s) }}
         />
         <Button
           variant="contained"
           type="submit"
-          sx={{ height: "50px", width: "90px" }}
+          sx={{ height: "56px", width: "90px" }}
         >
           Find
         </Button>

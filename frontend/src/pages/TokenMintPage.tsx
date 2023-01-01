@@ -61,6 +61,9 @@ export default function TokenCreationPage() {
               name="supply"
               type="number"
               inputProps={{ step: 1e-18, min: 0 }}
+              validation={{
+                min: { value: 0, message: "Must be greater or equal 0" },
+              }}
               required
               fullWidth
             />

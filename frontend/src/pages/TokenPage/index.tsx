@@ -8,7 +8,6 @@ import {
   useContractReads,
 } from "wagmi";
 import abi from "../../utils/abi/ERC20";
-import Title from "../../utils/components/Title";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { createContext } from "react";
 import {
@@ -18,6 +17,11 @@ import {
   BurnForm,
   StakingForm,
 } from "./forms";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
+import Stack from "@mui/material/Stack";
 
 interface TokenProps {
   address?: string;
@@ -58,7 +62,7 @@ export default function TokenPage() {
     signerOrProvider: signer,
   });
 
-  const { data, refetch } = useContractReads({
+  const { data: readData, refetch } = useContractReads({
     contracts: [
       {
         ...contract,
@@ -74,51 +78,66 @@ export default function TokenPage() {
 
   const tokenInfo = useToken({ address: contractAddress as `0x${string}` });
 
-  if ((tokenInfo.isFetching && !tokenInfo.isFetchedAfterMount) || !address)
+  if (tokenInfo.isFetching && !tokenInfo.isFetchedAfterMount)
     return (
-      <>
-        <Title text={"Token page"} />
-        {address ? (
-          <h1 className="text-2xl font-bold text-center">Fetching data...</h1>
-        ) : (
-          <div className="max-w-max mx-auto">
-            <ConnectButton />
-          </div>
-        )}
-      </>
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Token Page
+        </Typography>
+        <Typography variant="h5" sx={{ mt: "35vh" }}>
+          Fetching data
+          <CircularProgress size="30px" sx={{ ml: 2 }} />
+        </Typography>
+      </Box>
     );
   else
     return (
-      <div>
-        <Title text={"Token page"} />
-        <div className="card text-xl">
-          <h1 className="text-2xl font-semibold">{tokenInfo.data?.name}</h1>
-          <h2 className="my-2">{contractAddress}</h2>
-          <p className="text-left">
-            Balance:{" "}
-            <span className="italic text-blue-500 font-bold">
-              {ethers.utils.formatEther(data?.at(0) ?? 0)}
-            </span>{" "}
-            <span className="font-bold">{tokenInfo.data?.symbol}</span>
-          </p>
-          <TokenContext.Provider
-            value={{
-              token,
-              tokenData: {
-                balance: data?.at(0) ?? 0,
-                owner: data?.at(1) as string,
-                ...tokenInfo?.data,
-              },
-              refetch,
-            }}
-          >
-            <MintForm />
-            <TransferForm />
-            <ApproveForm />
-            <BurnForm />
-            <StakingForm />
-          </TokenContext.Provider>
-        </div>
-      </div>
+      <Box>
+        <Typography variant="h5" sx={{ mb: "25px" }}>
+          Token Page
+        </Typography>
+        <Container sx={{ border: "1px solid black", p: 2 }} maxWidth="md">
+          <Stack textAlign="center" gap={2}>
+            <Typography variant="h4">{tokenInfo.data?.name}</Typography>
+            {address ? (
+              <>
+                <Typography variant="h6">
+                  Balance:{" "}
+                  <Box
+                    component="span"
+                    color="primary.main"
+                    fontWeight="bold"
+                    fontStyle="italic"
+                  >
+                    {ethers.utils.formatEther(readData?.at(0) ?? 0)}{" "}
+                    {tokenInfo.data?.symbol}
+                  </Box>
+                </Typography>
+                <TokenContext.Provider
+                  value={{
+                    token,
+                    tokenData: {
+                      balance: readData?.at(0) ?? 0,
+                      owner: readData?.at(1) as string,
+                      ...tokenInfo?.data,
+                    },
+                    refetch,
+                  }}
+                >
+                  <MintForm />
+                  <TransferForm />
+                  <ApproveForm />
+                  <BurnForm />
+                  <StakingForm />
+                </TokenContext.Provider>
+              </>
+            ) : (
+              <Box mx="auto">
+                <ConnectButton />
+              </Box>
+            )}
+          </Stack>
+        </Container>
+      </Box>
     );
 }

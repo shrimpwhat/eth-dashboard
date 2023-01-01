@@ -157,13 +157,7 @@ export default function CollectionPage() {
         </Typography>
         <Container maxWidth="sm" sx={{ border: "1px solid black", p: 2 }}>
           <Stack textAlign={"center"} gap={2}>
-            <Typography
-              variant="h4"
-              textAlign="center"
-              sx={{ fontWeight: "bold" }}
-            >
-              {collectionInfo?.name}
-            </Typography>
+            <Typography variant="h4">{collectionInfo?.name}</Typography>
             <Box>
               <Chip
                 label={`${
@@ -219,7 +213,20 @@ export default function CollectionPage() {
                           name="amount"
                           type="number"
                           fullWidth
+                          required
                           sx={{ minWidth: "110px" }}
+                          validation={{
+                            min: {
+                              value: 1,
+                              message: "Must be greater than 0",
+                            },
+                            max: {
+                              value:
+                                collectionInfo.userLimit -
+                                collectionInfo.userMintedAmount,
+                              message: "Greater than your limit!",
+                            },
+                          }}
                           inputProps={{
                             min: 1,
                             max:
@@ -227,7 +234,11 @@ export default function CollectionPage() {
                               collectionInfo.userMintedAmount,
                           }}
                         />
-                        <Button variant="outlined" onClick={setMaxAmount}>
+                        <Button
+                          variant="outlined"
+                          onClick={setMaxAmount}
+                          sx={{ height: "56px" }}
+                        >
                           Max
                         </Button>
                       </Box>

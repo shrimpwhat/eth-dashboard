@@ -1,19 +1,25 @@
 import { ethers, BigNumber } from "ethers";
 import { useAccount } from "wagmi";
-import Input from "../../../utils/components/Input";
 import { errorAlert, txAlert } from "../../../utils/components/Popups";
-import { useRef, ChangeEvent, FormEvent, useContext } from "react";
+import { useRef, useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import Button from "@mui/material/Button";
+import { InputAdornment } from "@mui/material";
+
+interface FormData {
+  address: string;
+  amount: string;
+}
 
 const MintForm = () => {
   const { address } = useAccount();
-  const mintAddress = useRef("");
-  const mintAmount = useRef("0");
-
   const { token, tokenData, refetch } = useContext(TokenContext);
-
   const addRecentTransaction = useAddRecentTransaction();
+  const formContext = useForm<FormData>();
 
   const mintTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.mintTo(address, amount);
@@ -28,62 +34,70 @@ const MintForm = () => {
     return tx.hash;
   };
 
-  const handleMint = (e: FormEvent) => {
-    e.preventDefault();
-    if (!ethers.utils.isAddress(mintAddress.current))
-      errorAlert("Invalid mint address", "invalid-mint-address");
-    else {
-      txAlert(
-        `Successfully minted ${mintAmount.current} ${tokenData?.symbol}`,
-        mintTokens(
-          mintAddress.current,
-          ethers.utils.parseEther(mintAmount.current)
-        )
-      );
-    }
+  const handleMint = (data: FormData) => {
+    txAlert(
+      `Successfully minted ${data.amount} ${tokenData?.symbol}`,
+      mintTokens(data.address, ethers.utils.parseEther(data.amount))
+    );
   };
 
   if (tokenData?.owner !== address) return null;
   else
     return (
-      <div>
-        <hr className="mt-8 mb-5" />
-        <form
-          className="flex flex-wrap items-end justify-around gap-6"
-          onSubmit={handleMint}
-        >
-          <Input
-            text="Mint to"
-            id="mint-address"
-            className="w-52"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              mintAddress.current = e.target.value;
-            }}
-            maxText="current"
-            maxFn={() => {
-              const input = document.getElementById(
-                "mint-address"
-              ) as HTMLInputElement;
-              mintAddress.current = address as string;
-              input.value = address as string;
-            }}
-          />
-          <div className="flex flex-row items-end gap-3">
-            <Input
-              text="Mint amount"
-              className="w-52"
-              id="mint-amount"
-              type="number"
-              min={0}
-              step={1e-18}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                mintAmount.current = e.target.value;
+      <Box>
+        <Divider sx={{ mb: 3 }} />
+        <FormContainer formContext={formContext} onSuccess={handleMint}>
+          <Box
+            display="flex"
+            gap={3}
+            justifyContent="center"
+            alignItems="flex-start"
+            flexWrap="wrap"
+          >
+            <TextFieldElement
+              label="Mint to"
+              name="address"
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{ fontSize: "0.7rem" }}
+                      onClick={() => {
+                        formContext.setValue(
+                          "address",
+                          address ?? ethers.constants.AddressZero
+                        );
+                        formContext.trigger("address");
+                      }}
+                    >
+                      Current
+                    </Button>
+                  </InputAdornment>
+                ),
               }}
+              parseError={() => "Not an ethereum address!"}
+              validation={{ validate: (s) => ethers.utils.isAddress(s) }}
             />
-          </div>
-          <button className="submit-button">Mint</button>
-        </form>
-      </div>
+            <TextFieldElement
+              label="Mint amount"
+              name="amount"
+              type="number"
+              required
+              inputMode="decimal"
+              validation={{
+                min: { value: 1e-18, message: "Must be greater than 0" },
+              }}
+              inputProps={{ step: 1e-18, min: 1e-18 }}
+            />
+            <Button type="submit" variant="contained" sx={{ height: "56px" }}>
+              Mint
+            </Button>
+          </Box>
+        </FormContainer>
+      </Box>
     );
 };
 

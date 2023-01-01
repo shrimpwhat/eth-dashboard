@@ -190,12 +190,16 @@ const CreateCollection = () => {
           fullWidth
           type="number"
           inputProps={{ step: 1e-18, min: 0 }}
+          validation={{
+            min: { value: 0, message: "Must be greater or equal 0" },
+          }}
         />
         <TextFieldElement
           name="limit"
           label="User limit"
           type="number"
-          inputProps={{ min: 0 }}
+          inputProps={{ min: 1 }}
+          validation={{ min: { value: 1, message: "Must be greater than 0" } }}
           required
           fullWidth
         />
@@ -203,7 +207,8 @@ const CreateCollection = () => {
           name="supply"
           label="Max supply"
           type="number"
-          inputProps={{ min: 0 }}
+          inputProps={{ min: 1 }}
+          validation={{ min: { value: 1, message: "Must be greater than 0" } }}
           required
           fullWidth
         />
