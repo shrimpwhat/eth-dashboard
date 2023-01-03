@@ -3,7 +3,6 @@ pragma solidity >=0.7.0 <0.9.0;
 
 /*
     Based on:
-    https://github.com/beefyfinance/beefy-contracts/blob/master/contracts/BIFI/infra/BeefyRewardPool.sol
     https://solidity-by-example.org/defi/staking-rewards/
 */
 

@@ -40,9 +40,11 @@ export default function FindContract({
           label={text}
           name="address"
           helperText="Find already deployed contract"
-          parseError={() => "Not an ethereum address!"}
           fullWidth
-          validation={{ validate: (s) => ethers.utils.isAddress(s) }}
+          validation={{
+            validate: (s) =>
+              ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
+          }}
         />
         <Button
           variant="contained"

@@ -1,16 +1,24 @@
 import { ethers, BigNumber } from "ethers";
-import Input from "../../../utils/components/Input";
-import { errorAlert, txAlert } from "../../../utils/components/Popups";
-import { useRef, ChangeEvent, FormEvent, useContext } from "react";
+import { txAlert } from "../../../utils/components/Popups";
+import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import InputAdornment from "@mui/material/InputAdornment";
+import Button from "@mui/material/Button";
+
+interface FormData {
+  address: string;
+  amount: string;
+}
 
 const ApproveForm = () => {
-  const approveAddress = useRef("");
-  const approveAmount = useRef("0");
   const addRecentTransaction = useAddRecentTransaction();
 
   const { token, tokenData, refetch } = useContext(TokenContext);
+  const formContext = useForm<FormData>();
 
   const approveTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.approve(
@@ -26,62 +34,74 @@ const ApproveForm = () => {
     return tx.hash;
   };
 
-  const handleApprove = (e: FormEvent) => {
-    e.preventDefault();
-    if (!ethers.utils.isAddress(approveAddress.current))
-      errorAlert("Invalid approve address", "invalid-approve-address");
-    else {
-      txAlert(
-        `Successfully approved ${tokenData?.symbol}`,
-        approveTokens(
-          approveAddress.current,
-          ethers.utils.parseEther(approveAmount.current)
-        )
-      );
-    }
+  const handleApprove = (data: FormData) => {
+    txAlert(
+      `Successfully approved ${tokenData?.symbol}`,
+      approveTokens(data.address, ethers.utils.parseEther(data.amount))
+    );
   };
 
   return (
-    <div>
-      <hr className="mt-8 mb-5" />
-      <form
-        className="flex flex-wrap items-end justify-around gap-6"
-        onSubmit={handleApprove}
-      >
-        <Input
-          text="Approve address"
-          id="approve-address"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            approveAddress.current = e.target.value;
-          }}
-        />
-        <div className="flex flex-row items-end gap-3">
-          <Input
-            text="Approve amount"
-            id="approve-amount"
-            type="number"
-            min={0}
-            step={1e-18}
-            className="w-40"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              approveAmount.current = e.target.value;
+    <Box>
+      <Divider sx={{ mb: 2 }} />
+      <FormContainer formContext={formContext} onSuccess={handleApprove}>
+        <Box
+          display="flex"
+          gap={2}
+          justifyContent="center"
+          alignItems="flex-start"
+          flexWrap="wrap"
+        >
+          <TextFieldElement
+            label="Approve to"
+            name="address"
+            required
+            validation={{
+              validate: (s) =>
+                ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
             }}
-            maxText="max"
-            maxFn={() => {
-              const input = document.getElementById(
-                "approve-amount"
-              ) as HTMLInputElement;
-              const maxValue = ethers.utils.formatEther(
-                ethers.constants.MaxUint256
-              );
-              approveAmount.current = maxValue;
-              input.value = maxValue;
+            sx={{ width: "35%" }}
+          />
+          <TextFieldElement
+            sx={{ width: "30%" }}
+            label="Approve amount"
+            name="amount"
+            type="number"
+            inputProps={{
+              min: 0,
+              step: 1e-18,
+            }}
+            validation={{
+              min: { value: 0, message: "Must be greater or equal 0" },
+            }}
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    sx={{ fontSize: "0.7rem" }}
+                    onClick={() => {
+                      formContext.setValue(
+                        "amount",
+                        ethers.utils.formatEther(ethers.constants.MaxUint256)
+                      );
+                      formContext.trigger("amount");
+                    }}
+                  >
+                    Max
+                  </Button>
+                </InputAdornment>
+              ),
             }}
           />
-        </div>
-        <button className="submit-button">Approve</button>
-      </form>
-    </div>
+          <Button type="submit" variant="contained" sx={{ height: "56px" }}>
+            Approve
+          </Button>
+        </Box>
+      </FormContainer>
+    </Box>
   );
 };
 

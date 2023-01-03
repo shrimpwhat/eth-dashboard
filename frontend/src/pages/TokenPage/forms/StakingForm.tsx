@@ -13,6 +13,10 @@ import erc20StakingAbi from "../../../utils/abi/ERC20Staking";
 import Input from "../../../utils/components/Input";
 import { txAlert } from "../../../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { Divider } from "@mui/material";
 
 const StakingForm = () => {
   const SECS_PER_YEAR = 365 * 86400;
@@ -31,7 +35,7 @@ const StakingForm = () => {
     ...factoryData,
     signerOrProvider: signer,
   });
-  const { data: stakingAddress } = useContractRead({
+  const { data: stakingAddress, refetch } = useContractRead({
     ...factoryData,
     functionName: "tokenStakings",
     args: [
@@ -89,6 +93,7 @@ const StakingForm = () => {
       BigNumber.from(365 * 86400)
     );
     const receipt = await tx?.wait();
+    refetch();
     handleReceipt(receipt, `Deployed staking contract for ${tokenData?.name}`);
   };
 
@@ -108,32 +113,32 @@ const StakingForm = () => {
   };
 
   if (stakingAddress === ethers.constants.AddressZero) {
+    console.log(stakingAddress);
     if (address !== tokenData?.owner) return null;
     else
       return (
-        <div>
-          <div>
-            <p className="inline-block mr-4">
-              Staking contract hasn't been setup yet
-            </p>
-            <button
-              className="submit-button"
-              onClick={() =>
-                txAlert(
-                  "Staking contract successfuly deployed",
-                  setupStakingContract()
-                )
-              }
-            >
-              Setup
-            </button>
-          </div>
-        </div>
+        <Box>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Staking contract hasn't been setup yet
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={() =>
+              txAlert(
+                "Staking contract successfuly deployed",
+                setupStakingContract()
+              )
+            }
+          >
+            Setup
+          </Button>
+        </Box>
       );
   } else
     return (
       <div>
-        <hr className="mt-8 mb-5" />
+        <Divider />
         <h2 className="font-bold mb-3">Staking</h2>
 
         <div className="my-5 flex justify-between">

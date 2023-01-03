@@ -4,13 +4,22 @@ import { errorAlert, txAlert } from "../../../utils/components/Popups";
 import { useRef, ChangeEvent, FormEvent, useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import Button from "@mui/material/Button";
+import InputAdornment from "@mui/material/InputAdornment";
+
+interface FormData {
+  address: string;
+  amount: string;
+}
 
 const TransferForm = () => {
-  const transferAddress = useRef("");
-  const transferAmount = useRef("0");
   const addRecentTransaction = useAddRecentTransaction();
 
   const { token, tokenData, refetch } = useContext(TokenContext);
+  const formContext = useForm<FormData>();
 
   const transferTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.transfer(
@@ -28,69 +37,84 @@ const TransferForm = () => {
     return tx.hash;
   };
 
-  const handleTransfer = (e: FormEvent) => {
-    e.preventDefault();
-    if (!ethers.utils.isAddress(transferAddress.current))
-      errorAlert("Invalid transfer address", "invalid-transfer-address");
-    else if (
-      BigNumber.from(tokenData?.balance).lt(
-        ethers.utils.parseEther(transferAmount.current)
-      )
-    )
-      errorAlert(
-        "Insufficient balance for transfer",
-        "invalid-transfer-amount"
-      );
-    else {
-      txAlert(
-        `Successfully transfered ${transferAmount.current} ${tokenData?.symbol}`,
-        transferTokens(
-          transferAddress.current,
-          ethers.utils.parseEther(transferAmount.current)
-        )
-      );
-    }
+  const handleTransfer = (data: FormData) => {
+    txAlert(
+      `Successfully transfered ${data.amount} ${tokenData?.symbol}`,
+      transferTokens(data.address, ethers.utils.parseEther(data.amount))
+    );
   };
 
   return (
-    <div>
-      <hr className="mt-8 mb-5" />
-      <form
-        className="flex flex-wrap items-end justify-around gap-6"
-        onSubmit={handleTransfer}
-      >
-        <Input
-          text="Transfer address"
-          id="transfer-address"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            transferAddress.current = e.target.value;
-          }}
-        />
-        <div className="flex flex-row items-end gap-3">
-          <Input
-            text="Transfer amount"
-            id="transfer-amount"
-            type="number"
-            min={0}
-            step={1e-18}
-            className="w-40"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              transferAmount.current = e.target.value;
+    <Box>
+      <Divider sx={{ mb: 2 }} />
+      <FormContainer formContext={formContext} onSuccess={handleTransfer}>
+        <Box
+          display="flex"
+          gap={2}
+          justifyContent="center"
+          alignItems="flex-start"
+          flexWrap="wrap"
+        >
+          <TextFieldElement
+            label="Transfer to"
+            name="address"
+            required
+            validation={{
+              validate: (s) =>
+                ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
             }}
-            maxText="max"
-            maxFn={() => {
-              const input = document.getElementById(
-                "transfer-amount"
-              ) as HTMLInputElement;
-              const balance = ethers.utils.formatEther(tokenData?.balance ?? 0);
-              transferAmount.current = balance;
-              input.value = balance;
+            sx={{ width: "35%" }}
+          />
+          <TextFieldElement
+            sx={{ width: "30%" }}
+            label="Transfer amount"
+            name="amount"
+            type="number"
+            inputProps={{
+              min: 1e-18,
+              step: 1e-18,
+            }}
+            validation={{
+              min: { value: 1e-18, message: "Must be greater than 0" },
+              max: {
+                value: ethers.utils.formatUnits(
+                  tokenData?.balance ?? 0,
+                  tokenData?.decimals
+                ),
+                message: "Insufficient balance",
+              },
+            }}
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    sx={{ fontSize: "0.7rem" }}
+                    onClick={() => {
+                      formContext.setValue(
+                        "amount",
+                        ethers.utils.formatUnits(
+                          tokenData?.balance ?? 0,
+                          tokenData?.decimals
+                        )
+                      );
+                      formContext.trigger("amount");
+                    }}
+                  >
+                    Max
+                  </Button>
+                </InputAdornment>
+              ),
             }}
           />
-        </div>
-        <button className="submit-button">Transfer</button>
-      </form>
-    </div>
+          <Button type="submit" variant="contained" sx={{ height: "56px" }}>
+            Transfer
+          </Button>
+        </Box>
+      </FormContainer>
+    </Box>
   );
 };
 export default TransferForm;

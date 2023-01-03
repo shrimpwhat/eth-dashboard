@@ -1,7 +1,7 @@
 import { ethers, BigNumber } from "ethers";
 import { useAccount } from "wagmi";
-import { errorAlert, txAlert } from "../../../utils/components/Popups";
-import { useRef, useContext } from "react";
+import { txAlert } from "../../../utils/components/Popups";
+import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
 import Box from "@mui/material/Box";
@@ -45,11 +45,11 @@ const MintForm = () => {
   else
     return (
       <Box>
-        <Divider sx={{ mb: 3 }} />
+        <Divider sx={{ mb: 2 }} />
         <FormContainer formContext={formContext} onSuccess={handleMint}>
           <Box
             display="flex"
-            gap={3}
+            gap={2}
             justifyContent="center"
             alignItems="flex-start"
             flexWrap="wrap"
@@ -78,8 +78,10 @@ const MintForm = () => {
                   </InputAdornment>
                 ),
               }}
-              parseError={() => "Not an ethereum address!"}
-              validation={{ validate: (s) => ethers.utils.isAddress(s) }}
+              validation={{
+                validate: (s) =>
+                  ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
+              }}
             />
             <TextFieldElement
               label="Mint amount"
