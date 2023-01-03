@@ -11,8 +11,8 @@ contract CollectionFactory {
     function createCollection(
         string calldata name,
         string calldata symbol,
-        uint32 maxUserLimit,
-        uint32 maxSupply,
+        uint256 maxUserLimit,
+        uint256 maxSupply,
         uint256 tokenPrice,
         string calldata baseMetdataURI
     ) external payable {
@@ -30,11 +30,9 @@ contract CollectionFactory {
         emit CollectionCreated(collectionAddress, msg.sender);
     }
 
-    function getUserCollections(address user)
-        external
-        view
-        returns (address[] memory collections)
-    {
+    function getUserCollections(
+        address user
+    ) external view returns (address[] memory collections) {
         collections = createdCollections[user];
     }
 }

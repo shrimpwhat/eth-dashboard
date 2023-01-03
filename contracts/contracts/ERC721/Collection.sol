@@ -5,16 +5,16 @@ import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Collection is ERC721A, Ownable {
-    uint32 public MAX_USER_LIMIT;
-    uint32 public MAX_SUPPLY;
+    uint256 public MAX_USER_LIMIT;
+    uint256 public MAX_SUPPLY;
     uint256 public TOKEN_PRICE;
     string private baseURI;
 
     constructor(
         string memory name,
         string memory symbol,
-        uint32 _MAX_USER_LIMIT,
-        uint32 _MAX_SUPPLY,
+        uint256 _MAX_USER_LIMIT,
+        uint256 _MAX_SUPPLY,
         uint256 _TOKEN_PRICE,
         string memory baseMetdataURI
     ) ERC721A(name, symbol) {
@@ -45,7 +45,7 @@ contract Collection is ERC721A, Ownable {
         return _totalMinted();
     }
 
-    function mint(uint16 amount) external payable callerIsUser {
+    function mint(uint256 amount) external payable callerIsUser {
         require(
             _numberMinted(msg.sender) + amount <= MAX_USER_LIMIT,
             "Exceded max mint limit"
