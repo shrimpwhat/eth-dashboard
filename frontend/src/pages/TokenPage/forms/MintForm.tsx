@@ -90,9 +90,14 @@ const MintForm = () => {
               required
               inputMode="decimal"
               validation={{
-                min: { value: 1e-18, message: "Must be greater than 0" },
+                min: {
+                  value: 10 ** -(tokenData?.decimals ?? 18),
+                  message: "Must be greater than 0",
+                },
               }}
-              inputProps={{ step: 1e-18, min: 1e-18 }}
+              inputProps={{
+                min: 10 ** -(tokenData?.decimals ?? 18),
+              }}
             />
             <Button type="submit" variant="contained" sx={{ height: "56px" }}>
               Mint

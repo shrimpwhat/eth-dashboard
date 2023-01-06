@@ -54,4 +54,8 @@ contract Collection is ERC721A, Ownable {
         require(_totalMinted() + amount <= MAX_SUPPLY, "Reached max supply");
         _safeMint(msg.sender, amount);
     }
+
+    function burn(uint256 tokenId) external {
+        _burn(tokenId);
+    }
 }

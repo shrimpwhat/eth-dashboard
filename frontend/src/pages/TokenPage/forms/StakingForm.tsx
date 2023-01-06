@@ -1,5 +1,5 @@
 import { ethers, BigNumber } from "ethers";
-import { ChangeEvent, useContext, useRef } from "react";
+import { ChangeEvent, useContext, useRef, useState } from "react";
 import {
   useContractRead,
   useContractReads,
@@ -16,7 +16,13 @@ import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Divider } from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ToggleButton from "@mui/material/ToggleButton";
+import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const StakingForm = () => {
   const SECS_PER_YEAR = 365 * 86400;
@@ -26,6 +32,16 @@ const StakingForm = () => {
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const newDuration = useRef("0");
+
+  const [type, setType] = useState<"deposit" | "withdraw">("deposit");
+  const handleType = (
+    event: React.MouseEvent<HTMLElement>,
+    newType: "deposit" | "withdraw" | null
+  ) => {
+    if (newType !== null) setType(newType);
+  };
+
+  const stakeFormContext = useForm<{ amount: string }>();
 
   const factoryData = {
     address: process.env.REACT_APP_ERC20_STAKING_FACTORY as string,
@@ -51,7 +67,7 @@ const StakingForm = () => {
     ...stakingContractData,
     signerOrProvider: signer,
   });
-  const { data, refetch: refetchStaking } = useContractReads({
+  const { data: stakingData, refetch: refetchStaking } = useContractReads({
     contracts: [
       { ...stakingContractData, functionName: "duration" },
       { ...stakingContractData, functionName: "totalSupply" },
@@ -67,11 +83,15 @@ const StakingForm = () => {
         functionName: "balanceOf",
         args: [address ?? ethers.constants.AddressZero],
       },
-      {
-        ...stakingContractData,
-        functionName: "periodFinish",
-      },
     ],
+    select: (data) => ({
+      duration: data[0],
+      totalSupply: data[1],
+      periodFinish: data[2],
+      rewardRate: data[3],
+      earned: data[4],
+      amount: data[5],
+    }),
   });
 
   const handleReceipt = (
@@ -107,9 +127,19 @@ const StakingForm = () => {
   };
 
   const getApr = () => {
-    const rate = parseFloat(data?.at(3)?.toString() ?? "0");
-    const totalStaked = parseFloat(data?.at(1)?.toString() ?? "0");
+    const rate = parseFloat(stakingData?.periodFinish?.toString() ?? "0");
+    const totalStaked = parseFloat(stakingData?.totalSupply?.toString() ?? "0");
     return (rate * SECS_PER_YEAR) / totalStaked;
+  };
+
+  const handleMaxStake = () => {
+    let amount;
+    if (type === "deposit") amount = tokenData?.balance.toString();
+    else amount = stakingData?.amount.toString();
+    stakeFormContext.setValue(
+      "amount",
+      ethers.utils.formatUnits(amount ?? 0, tokenData?.decimals)
+    );
   };
 
   if (stakingAddress === ethers.constants.AddressZero) {
@@ -137,33 +167,160 @@ const StakingForm = () => {
       );
   } else
     return (
-      <div>
+      <Stack gap={2}>
         <Divider />
-        <h2 className="font-bold mb-3">Staking</h2>
+        <Typography variant="h5">Staking</Typography>
+        <Box
+          display="flex"
+          gap={2}
+          mx="auto"
+          flexWrap="wrap"
+          justifyContent="center"
+        >
+          <Box
+            border="1px solid black"
+            p={2}
+            borderRadius="10px"
+            bgcolor="grey.100"
+          >
+            <Typography sx={{ mb: 1 }} fontWeight="bold">
+              APR
+            </Typography>
+            <Typography component="span" fontWeight="bold" color="primary.main">
+              {getApr()} %
+            </Typography>
+          </Box>
+          <Box
+            border="1px solid black"
+            p={2}
+            borderRadius="10px"
+            bgcolor="grey.100"
+          >
+            <Typography sx={{ mb: 1 }} fontWeight="bold">
+              TVL
+            </Typography>
+            <Typography component="span" fontWeight="bold" color="primary.main">
+              {ethers.utils.formatUnits(
+                stakingData?.totalSupply ?? 0,
+                tokenData?.decimals
+              )}{" "}
+              {tokenData?.symbol}
+            </Typography>
+          </Box>
+          <Box
+            border="1px solid black"
+            p={2}
+            borderRadius="10px"
+            bgcolor="grey.100"
+          >
+            <Typography sx={{ mb: 1 }} fontWeight="bold">
+              Reward period ends in
+            </Typography>
+            <Typography component="span" fontWeight="bold" color="primary.main">
+              {stakingData?.periodFinish?.div(86400).toString()} days
+            </Typography>
+          </Box>
+        </Box>
 
-        <div className="my-5 flex justify-between">
-          <p>
-            TVL:{" "}
-            <span className="font-bold">
-              {ethers.utils.formatEther(data?.at(1) ?? 0)} {tokenData?.symbol}
-            </span>
-          </p>
-          <p>
-            Reward period ends in:{" "}
-            <span className="whitespace-nowrap font-bold">
-              {data?.at(6)?.div(86400).toString()} days
-            </span>
-          </p>
-          <p>
-            APR: <span className="font-bold">{getApr()} %</span>
-          </p>
-          <p>
-            Your stake:{" "}
-            <span className="font-bold">
-              {ethers.utils.formatEther(data?.at(5) ?? 0)} {tokenData?.symbol}
-            </span>
-          </p>
-        </div>
+        <Box
+          gap={2}
+          display="flex"
+          justifyContent="center"
+          mt={2}
+          flexWrap="wrap"
+        >
+          <TextField
+            defaultValue={`${ethers.utils.formatUnits(
+              stakingData?.amount ?? 0,
+              tokenData?.decimals
+            )} ${tokenData?.symbol}`}
+            inputProps={{ readOnly: true }}
+            label="Staked amount"
+          />
+          <TextField
+            defaultValue={`${ethers.utils.formatUnits(
+              stakingData?.earned ?? 0,
+              tokenData?.decimals
+            )} ${tokenData?.symbol}`}
+            inputProps={{ readOnly: true }}
+            label="Recent profit"
+          />
+        </Box>
+        <Box gap={1} display="flex" flexWrap="wrap" justifyContent="center">
+          <Button variant="contained" sx={{ width: "120px" }}>
+            Claim
+          </Button>
+          <Button variant="contained" sx={{ width: "120px" }}>
+            Compound
+          </Button>
+        </Box>
+
+        <ToggleButtonGroup
+          value={type}
+          exclusive
+          onChange={handleType}
+          color="primary"
+          sx={{ mx: "auto", mt: 3 }}
+        >
+          <ToggleButton value="deposit">Deposit</ToggleButton>
+          <ToggleButton value="withdraw">Withdraw</ToggleButton>
+        </ToggleButtonGroup>
+        <FormContainer formContext={stakeFormContext} onSuccess={() => {}}>
+          <Box
+            display="flex"
+            gap={2}
+            justifyContent="center"
+            flexWrap="wrap"
+            alignItems="flex-start"
+          >
+            <TextFieldElement
+              label="Amount"
+              name="amount"
+              required
+              type="number"
+              inputProps={{
+                min: 10 ** -(tokenData?.decimals ?? 18),
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{ fontSize: "0.7rem" }}
+                      onClick={handleMaxStake}
+                    >
+                      Max
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+              validation={{
+                min: {
+                  value: 10 ** -(tokenData?.decimals ?? 18),
+                  message: "Amount must be greater than 0",
+                },
+                max: {
+                  value: ethers.utils.formatUnits(
+                    (type === "deposit"
+                      ? tokenData?.balance
+                      : stakingData?.amount) ?? 0,
+                    tokenData?.decimals
+                  ),
+                  message: "Insufficient balance",
+                },
+              }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ width: "110px", height: "56px" }}
+            >
+              {type === "deposit" ? "Deposit" : "Withdraw"}
+            </Button>
+          </Box>
+        </FormContainer>
+
         {tokenData?.owner === address && (
           <div className="flex justify-evenly items-center">
             <form>
@@ -180,7 +337,7 @@ const StakingForm = () => {
                 <p className="w-80">
                   Current duration of each reward period is:{" "}
                   <span className="whitespace-nowrap font-bold">
-                    {data?.at(0)?.div(86400)?.toString()} days{" "}
+                    {stakingData?.duration?.div(86400)?.toString()} days{" "}
                   </span>
                 </p>
                 <Input
@@ -197,8 +354,8 @@ const StakingForm = () => {
             </form>
           </div>
         )}
-        <p className="text-lg text-left">Contract: {stakingAddress}</p>
-      </div>
+        {/* <p className="text-lg text-left">Contract: {stakingAddress}</p> */}
+      </Stack>
     );
 };
 

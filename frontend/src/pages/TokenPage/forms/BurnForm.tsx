@@ -1,7 +1,6 @@
 import { ethers, BigNumber } from "ethers";
-import Input from "../../../utils/components/Input";
-import { errorAlert, txAlert } from "../../../utils/components/Popups";
-import { useRef, ChangeEvent, FormEvent, useContext } from "react";
+import { txAlert } from "../../../utils/components/Popups";
+import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
 import Box from "@mui/material/Box";
@@ -52,11 +51,20 @@ const BurnForm = () => {
             name="amount"
             type="number"
             inputProps={{
-              min: 0,
-              step: 1e-18,
+              min: 10 ** -(tokenData?.decimals ?? 18),
             }}
             validation={{
-              min: { value: 0, message: "Must be greater or equal 0" },
+              min: {
+                value: 10 ** -(tokenData?.decimals ?? 18),
+                message: "Must be greater than 0",
+              },
+              max: {
+                value: ethers.utils.formatUnits(
+                  tokenData?.balance ?? 0,
+                  tokenData?.decimals
+                ),
+                message: "Insufficient balance",
+              },
             }}
             required
             InputProps={{

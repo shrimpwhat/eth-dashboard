@@ -14,10 +14,10 @@ import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import FieldsWrapper from "../../utils/components/FieldsWrapper";
 import SubmitButton from "../../utils/components/SubmitButton";
 import Box from "@mui/material/Box";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import { ChangeEvent, useState } from "react";
 import Typography from "@mui/material/Typography";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ToggleButton from "@mui/material/ToggleButton";
 
 const contractAddress = process.env.REACT_APP_NFT_FACTORY_ADDRESS as string;
 const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
@@ -53,9 +53,12 @@ const CreateCollection = () => {
   });
   const addRecentTransaction = useAddRecentTransaction();
 
-  const [active, setActive] = useState(0);
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActive(newValue);
+  const [active, setActive] = useState<"url" | "upload">("url");
+  const handleActive = (
+    event: React.MouseEvent<HTMLElement>,
+    newActive: "url" | "upload" | null
+  ) => {
+    if (newActive !== null) setActive(newActive);
   };
 
   const [folder, setFolder] = useState<FileList | null>(null);
@@ -189,7 +192,7 @@ const CreateCollection = () => {
           required
           fullWidth
           type="number"
-          inputProps={{ step: 1e-18, min: 0 }}
+          inputProps={{ min: 0 }}
           validation={{
             min: { value: 0, message: "Must be greater or equal 0" },
           }}
@@ -212,13 +215,21 @@ const CreateCollection = () => {
           required
           fullWidth
         />
-        <Box>
-          <Tabs value={active} onChange={handleChange} centered>
-            <Tab label="Provide URL" />
-            <Tab label="Upload media files" />
-          </Tabs>
-        </Box>
-        {active === 0 ? (
+        <ToggleButtonGroup
+          value={active}
+          exclusive
+          onChange={handleActive}
+          color="primary"
+          sx={{ mx: "auto" }}
+        >
+          <ToggleButton value="url" aria-label="left aligned">
+            Provide URL
+          </ToggleButton>
+          <ToggleButton value="upload" aria-label="centered">
+            Upload media files
+          </ToggleButton>
+        </ToggleButtonGroup>
+        {active === "url" ? (
           <TextFieldElement
             name="uri"
             label="Base metadata URI"

@@ -60,16 +60,13 @@ const ApproveForm = () => {
               validate: (s) =>
                 ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
             }}
-            sx={{ width: "35%" }}
           />
           <TextFieldElement
-            sx={{ width: "30%" }}
             label="Approve amount"
             name="amount"
             type="number"
             inputProps={{
               min: 0,
-              step: 1e-18,
             }}
             validation={{
               min: { value: 0, message: "Must be greater or equal 0" },

@@ -1,7 +1,6 @@
 import { ethers, BigNumber } from "ethers";
-import Input from "../../../utils/components/Input";
-import { errorAlert, txAlert } from "../../../utils/components/Popups";
-import { useRef, ChangeEvent, FormEvent, useContext } from "react";
+import { txAlert } from "../../../utils/components/Popups";
+import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
 import Divider from "@mui/material/Divider";
@@ -63,19 +62,23 @@ const TransferForm = () => {
               validate: (s) =>
                 ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
             }}
-            sx={{ width: "35%" }}
           />
           <TextFieldElement
-            sx={{ width: "30%" }}
             label="Transfer amount"
             name="amount"
             type="number"
             inputProps={{
-              min: 1e-18,
-              step: 1e-18,
+              min: 10 ** -(tokenData?.decimals ?? 18),
+              max: ethers.utils.formatUnits(
+                tokenData?.balance ?? 0,
+                tokenData?.decimals
+              ),
             }}
             validation={{
-              min: { value: 1e-18, message: "Must be greater than 0" },
+              min: {
+                value: 10 ** -(tokenData?.decimals ?? 18),
+                message: "Must be greater than 0",
+              },
               max: {
                 value: ethers.utils.formatUnits(
                   tokenData?.balance ?? 0,
