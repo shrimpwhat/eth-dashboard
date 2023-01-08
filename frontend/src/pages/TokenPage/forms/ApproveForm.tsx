@@ -5,9 +5,10 @@ import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
-import InputAdornment from "@mui/material/InputAdornment";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
+import MaxValueInput from "../../../utils/components/MaxValueInput";
+import Grid from "@mui/material/Grid";
 
 interface FormData {
   address: string;
@@ -18,7 +19,6 @@ const ApproveForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
 
   const { token, tokenData, refetch } = useContext(TokenContext);
-  const formContext = useForm<FormData>();
 
   const approveTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.approve(
@@ -44,59 +44,38 @@ const ApproveForm = () => {
   return (
     <Box>
       <Divider sx={{ mb: 2 }} />
-      <FormContainer formContext={formContext} onSuccess={handleApprove}>
-        <Box
-          display="flex"
-          gap={2}
-          justifyContent="center"
-          alignItems="flex-start"
-          flexWrap="wrap"
-        >
-          <TextFieldElement
-            label="Approve to"
-            name="address"
-            required
-            validation={{
-              validate: (s) =>
-                ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
-            }}
-          />
-          <TextFieldElement
-            label="Approve amount"
-            name="amount"
-            type="number"
-            inputProps={{
-              min: 0,
-            }}
-            validation={{
-              min: { value: 0, message: "Must be greater or equal 0" },
-            }}
-            required
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    sx={{ fontSize: "0.7rem" }}
-                    onClick={() => {
-                      formContext.setValue(
-                        "amount",
-                        ethers.utils.formatEther(ethers.constants.MaxUint256)
-                      );
-                      formContext.trigger("amount");
-                    }}
-                  >
-                    Max
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button type="submit" variant="contained" sx={{ height: "56px" }}>
-            Approve
-          </Button>
-        </Box>
+      <FormContainer onSuccess={handleApprove}>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} sm={6} md={5}>
+            <TextFieldElement
+              label="Approve to"
+              name="address"
+              required
+              fullWidth
+              validation={{
+                validate: (s) =>
+                  ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <MaxValueInput
+              label="Amount"
+              minZero
+              fullWidth
+              maxValue={ethers.utils.formatEther(ethers.constants.MaxUint256)}
+            />
+          </Grid>
+          <Grid item xs={12} sm="auto">
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ height: "56px", width: "100px" }}
+            >
+              Approve
+            </Button>
+          </Grid>
+        </Grid>
       </FormContainer>
     </Box>
   );

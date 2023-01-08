@@ -8,7 +8,8 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
-import { InputAdornment } from "@mui/material";
+import { Grid, InputAdornment } from "@mui/material";
+// import { MainWidthContext } from "../../../App";
 
 interface FormData {
   address: string;
@@ -35,6 +36,7 @@ const MintForm = () => {
   };
 
   const handleMint = (data: FormData) => {
+    console.log(data);
     txAlert(
       `Successfully minted ${data.amount} ${tokenData?.symbol}`,
       mintTokens(data.address, ethers.utils.parseEther(data.amount))
@@ -47,62 +49,70 @@ const MintForm = () => {
       <Box>
         <Divider sx={{ mb: 2 }} />
         <FormContainer formContext={formContext} onSuccess={handleMint}>
-          <Box
-            display="flex"
-            gap={2}
-            justifyContent="center"
-            alignItems="flex-start"
-            flexWrap="wrap"
-          >
-            <TextFieldElement
-              label="Mint to"
-              name="address"
-              required
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ fontSize: "0.7rem" }}
-                      onClick={() => {
-                        formContext.setValue(
-                          "address",
-                          address ?? ethers.constants.AddressZero
-                        );
-                        formContext.trigger("address");
-                      }}
-                    >
-                      Current
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-              validation={{
-                validate: (s) =>
-                  ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
-              }}
-            />
-            <TextFieldElement
-              label="Mint amount"
-              name="amount"
-              type="number"
-              required
-              inputMode="decimal"
-              validation={{
-                min: {
-                  value: 10 ** -(tokenData?.decimals ?? 18),
-                  message: "Must be greater than 0",
-                },
-              }}
-              inputProps={{
-                min: 10 ** -(tokenData?.decimals ?? 18),
-              }}
-            />
-            <Button type="submit" variant="contained" sx={{ height: "56px" }}>
-              Mint
-            </Button>
-          </Box>
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} sm={6} md={5}>
+              <TextFieldElement
+                label="Mint to"
+                name="address"
+                required
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={{ fontSize: "0.7rem" }}
+                        onClick={() => {
+                          formContext.setValue(
+                            "address",
+                            address ?? ethers.constants.AddressZero
+                          );
+                          formContext.trigger("address");
+                        }}
+                      >
+                        Current
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
+                validation={{
+                  validate: (s) =>
+                    ethers.utils.isAddress(s)
+                      ? true
+                      : "Not an ethereum address!",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <TextFieldElement
+                label="Mint amount"
+                name="amount"
+                type="number"
+                required
+                fullWidth
+                inputMode="decimal"
+                validation={{
+                  min: {
+                    value: 10 ** -(tokenData?.decimals ?? 18),
+                    message: "Must be greater than 0",
+                  },
+                }}
+                inputProps={{
+                  min: 1,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm="auto">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ height: "56px", width: "100px" }}
+              >
+                Mint
+              </Button>
+            </Grid>
+          </Grid>
         </FormContainer>
       </Box>
     );

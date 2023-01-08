@@ -96,7 +96,10 @@ export default function TokenPage() {
         <Typography variant="h5" sx={{ mb: "25px" }}>
           Token Page
         </Typography>
-        <Container sx={{ border: "1px solid black", p: 2 }} maxWidth="md">
+        <Container
+          sx={{ border: "2px solid black", p: 2, borderRadius: "10px" }}
+          maxWidth="md"
+        >
           <Stack textAlign="center" gap={2}>
             <Typography variant="h4">{tokenInfo.data?.name}</Typography>
             {address ? (

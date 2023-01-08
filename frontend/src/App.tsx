@@ -80,7 +80,9 @@ const App = () => {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => {
+              handleDrawerOpen();
+            }}
             edge="start"
             sx={{ mr: 2, ...(open && matches && { display: "none" }) }}
           >
@@ -122,7 +124,12 @@ const App = () => {
               <Box sx={{ mx: "auto" }}>
                 <ConnectButton />
               </Box>
-              <IconButton onClick={handleDrawerClose}>
+              <IconButton
+                onClick={() => {
+                  handleDrawerClose();
+                }}
+                id="drawer-close"
+              >
                 <ChevronLeftIcon />
               </IconButton>
             </DrawerHeader>

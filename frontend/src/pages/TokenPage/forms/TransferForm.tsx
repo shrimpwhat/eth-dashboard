@@ -7,7 +7,8 @@ import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
-import InputAdornment from "@mui/material/InputAdornment";
+import Grid from "@mui/material/Grid";
+import MaxValueInput from "../../../utils/components/MaxValueInput";
 
 interface FormData {
   address: string;
@@ -16,7 +17,6 @@ interface FormData {
 
 const TransferForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
-
   const { token, tokenData, refetch } = useContext(TokenContext);
   const formContext = useForm<FormData>();
 
@@ -47,75 +47,32 @@ const TransferForm = () => {
     <Box>
       <Divider sx={{ mb: 2 }} />
       <FormContainer formContext={formContext} onSuccess={handleTransfer}>
-        <Box
-          display="flex"
-          gap={2}
-          justifyContent="center"
-          alignItems="flex-start"
-          flexWrap="wrap"
-        >
-          <TextFieldElement
-            label="Transfer to"
-            name="address"
-            required
-            validation={{
-              validate: (s) =>
-                ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
-            }}
-          />
-          <TextFieldElement
-            label="Transfer amount"
-            name="amount"
-            type="number"
-            inputProps={{
-              min: 10 ** -(tokenData?.decimals ?? 18),
-              max: ethers.utils.formatUnits(
-                tokenData?.balance ?? 0,
-                tokenData?.decimals
-              ),
-            }}
-            validation={{
-              min: {
-                value: 10 ** -(tokenData?.decimals ?? 18),
-                message: "Must be greater than 0",
-              },
-              max: {
-                value: ethers.utils.formatUnits(
-                  tokenData?.balance ?? 0,
-                  tokenData?.decimals
-                ),
-                message: "Insufficient balance",
-              },
-            }}
-            required
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    sx={{ fontSize: "0.7rem" }}
-                    onClick={() => {
-                      formContext.setValue(
-                        "amount",
-                        ethers.utils.formatUnits(
-                          tokenData?.balance ?? 0,
-                          tokenData?.decimals
-                        )
-                      );
-                      formContext.trigger("amount");
-                    }}
-                  >
-                    Max
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button type="submit" variant="contained" sx={{ height: "56px" }}>
-            Transfer
-          </Button>
-        </Box>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} sm={6} md={5}>
+            <TextFieldElement
+              label="Transfer to"
+              name="address"
+              required
+              fullWidth
+              validation={{
+                validate: (s) =>
+                  ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <MaxValueInput label="Amount" fullWidth />
+          </Grid>
+          <Grid item xs={12} sm="auto">
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ height: "56px", width: "100px" }}
+            >
+              Transfer
+            </Button>
+          </Grid>
+        </Grid>
       </FormContainer>
     </Box>
   );
