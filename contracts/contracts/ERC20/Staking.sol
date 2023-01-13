@@ -25,6 +25,7 @@ contract StakingPool is Ownable {
     uint256 public rewardRate;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
+    uint256 public rewardPool;
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
     mapping(address => uint) public balanceOf;
@@ -106,6 +107,7 @@ contract StakingPool is Ownable {
         require(reward > 0, "Nothing to harvest");
         rewards[msg.sender] = 0;
         stakedToken.safeTransfer(msg.sender, reward);
+        rewardPool -= reward;
         emit RewardPaid(msg.sender, reward);
     }
 
@@ -137,6 +139,7 @@ contract StakingPool is Ownable {
         );
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp.add(duration);
+        rewardPool += reward;
         emit RewardAdded(reward);
     }
 

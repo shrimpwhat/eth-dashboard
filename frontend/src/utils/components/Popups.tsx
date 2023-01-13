@@ -101,7 +101,7 @@ export const deployedTokenAlert = (fn: Promise<string>) => {
 };
 
 export const txAlert = (text: string, fn: Promise<any>) => {
-  basePromisePopup(fn, (data: string) => (
+  return basePromisePopup(fn, (data: string) => (
     <Box>
       <Typography variant="body2">{text}</Typography>
       <Link
@@ -109,7 +109,7 @@ export const txAlert = (text: string, fn: Promise<any>) => {
         rel="noreferrer"
         href={`https://goerli.etherscan.io/tx/${data}`}
       >
-        View on Etherscan
+        View on Explorer
       </Link>
     </Box>
   ));

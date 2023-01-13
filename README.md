@@ -7,4 +7,3 @@ Here you can:
 3. Setup a staking contract for your nfts that will reward stakers with your ERC20 token
 4. Mint your own ERC20 token
 5. Setup a staking pool for your ERC20 token
-6. Provide a liquidity for your ERC20 token and make it available for swaps

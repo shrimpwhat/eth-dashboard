@@ -17,6 +17,7 @@ import {
   BurnForm,
   StakingForm,
 } from "./forms";
+import floatValue from "../../utils/components/FloatValue";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -112,8 +113,10 @@ export default function TokenPage() {
                     fontWeight="bold"
                     fontStyle="italic"
                   >
-                    {ethers.utils.formatEther(readData?.at(0) ?? 0)}{" "}
-                    {tokenInfo.data?.symbol}
+                    {`${floatValue(
+                      ethers.utils.formatEther(readData?.at(0) ?? 0),
+                      5
+                    )} ${tokenInfo.data?.symbol}`}
                   </Box>
                 </Typography>
                 <TokenContext.Provider

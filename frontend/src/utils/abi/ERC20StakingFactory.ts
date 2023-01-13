@@ -20,8 +20,16 @@ export default [
   },
   {
     inputs: [
-      { internalType: "address", name: "_token", type: "address" },
-      { internalType: "uint256", name: "_duration", type: "uint256" },
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_duration",
+        type: "uint256",
+      },
     ],
     name: "createPool",
     outputs: [],
@@ -29,16 +37,40 @@ export default [
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "_address", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_address",
+        type: "address",
+      },
+    ],
     name: "getUserPools",
-    outputs: [{ internalType: "address[]", name: "pools", type: "address[]" }],
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "pools",
+        type: "address[]",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "", type: "address" }],
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     name: "tokenStakings",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
