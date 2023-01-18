@@ -96,7 +96,7 @@ contract StakingPool is Ownable {
         emit Withdrawn(msg.sender, amount);
     }
 
-    function exit() external {
+    function exit() external updateReward(msg.sender) {
         require(balanceOf[msg.sender] > 0, "Nothing to withdraw");
         withdraw(balanceOf[msg.sender]);
         getReward();
@@ -106,8 +106,8 @@ contract StakingPool is Ownable {
         reward = earned(msg.sender);
         require(reward > 0, "Nothing to harvest");
         rewards[msg.sender] = 0;
-        stakedToken.safeTransfer(msg.sender, reward);
         rewardPool -= reward;
+        stakedToken.safeTransfer(msg.sender, reward);
         emit RewardPaid(msg.sender, reward);
     }
 

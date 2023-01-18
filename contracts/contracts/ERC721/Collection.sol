@@ -2,12 +2,14 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "erc721a/contracts/ERC721A.sol";
+import "erc721a/contracts/extensions/ERC721ABurnable.sol";
+import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Collection is ERC721A, Ownable {
-    uint256 public MAX_USER_LIMIT;
-    uint256 public MAX_SUPPLY;
-    uint256 public TOKEN_PRICE;
+contract Collection is ERC721ABurnable, ERC721AQueryable, Ownable {
+    uint256 public immutable MAX_USER_LIMIT;
+    uint256 public immutable MAX_SUPPLY;
+    uint256 public immutable TOKEN_PRICE;
     string private baseURI;
 
     constructor(
@@ -52,10 +54,6 @@ contract Collection is ERC721A, Ownable {
         );
         require(msg.value >= TOKEN_PRICE * amount, "Not enough ETH sent");
         require(_totalMinted() + amount <= MAX_SUPPLY, "Reached max supply");
-        _safeMint(msg.sender, amount);
-    }
-
-    function burn(uint256 tokenId) external {
-        _burn(tokenId);
+        _mint(msg.sender, amount);
     }
 }
