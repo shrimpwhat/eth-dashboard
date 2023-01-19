@@ -5,7 +5,6 @@ import "./Staking.sol";
 
 contract StakingPoolFactory {
     mapping(address => address[]) createdPools; // user address -> created contracts
-
     mapping(address => address) public tokenStakings; // token address -> staking contract address
 
     event PoolCreated(address poolAddress, address creatorAddress);

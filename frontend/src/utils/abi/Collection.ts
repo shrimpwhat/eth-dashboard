@@ -57,6 +57,11 @@ export default [
   },
   {
     inputs: [],
+    name: "InvalidQueryRange",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "MintERC2309QuantityExceedsLimit",
     type: "error",
   },
@@ -327,6 +332,88 @@ export default [
         type: "uint256",
       },
     ],
+    name: "explicitOwnershipOf",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "addr",
+            type: "address",
+          },
+          {
+            internalType: "uint64",
+            name: "startTimestamp",
+            type: "uint64",
+          },
+          {
+            internalType: "bool",
+            name: "burned",
+            type: "bool",
+          },
+          {
+            internalType: "uint24",
+            name: "extraData",
+            type: "uint24",
+          },
+        ],
+        internalType: "struct IERC721A.TokenOwnership",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256[]",
+        name: "tokenIds",
+        type: "uint256[]",
+      },
+    ],
+    name: "explicitOwnershipsOf",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "addr",
+            type: "address",
+          },
+          {
+            internalType: "uint64",
+            name: "startTimestamp",
+            type: "uint64",
+          },
+          {
+            internalType: "bool",
+            name: "burned",
+            type: "bool",
+          },
+          {
+            internalType: "uint24",
+            name: "extraData",
+            type: "uint24",
+          },
+        ],
+        internalType: "struct IERC721A.TokenOwnership[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
     name: "getApproved",
     outputs: [
       {
@@ -561,6 +648,54 @@ export default [
         internalType: "string",
         name: "",
         type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "tokensOfOwner",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "start",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "stop",
+        type: "uint256",
+      },
+    ],
+    name: "tokensOfOwnerIn",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
       },
     ],
     stateMutability: "view",

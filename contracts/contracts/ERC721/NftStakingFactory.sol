@@ -5,6 +5,7 @@ import "./NftStaking.sol";
 
 contract NftStakingFactory {
     mapping(address => address[]) createdStakingContracts;
+    mapping(address => address) public collectionToStakingContract;
 
     event ContractCreated(address contractAddress, address creatorAddress);
 
@@ -20,14 +21,13 @@ contract NftStakingFactory {
         );
         address contractAddress = address(stakingContract);
         createdStakingContracts[msg.sender].push(contractAddress);
+        collectionToStakingContract[_nftCollection] = contractAddress;
         emit ContractCreated(contractAddress, msg.sender);
     }
 
-    function getUserContracts(address _address)
-        external
-        view
-        returns (address[] memory contracts)
-    {
+    function getUserContracts(
+        address _address
+    ) external view returns (address[] memory contracts) {
         contracts = createdStakingContracts[_address];
     }
 }

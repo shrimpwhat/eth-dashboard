@@ -1,47 +1,38 @@
-import { useParams } from "react-router-dom";
 import {
   useContract,
   useSigner,
   useAccount,
   useNetwork,
-  useContractReads,
   useBalance,
+  useContractReads,
 } from "wagmi";
-import Collection from "../utils/abi/Collection";
-import { nftMintAlert, txAlert } from "../utils/components/Popups";
+import { nftMintAlert, txAlert } from "../../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
-import SubmitButton from "../utils/components/SubmitButton";
-import FieldsWrapper from "../utils/components/FieldsWrapper";
+import SubmitButton from "../../utils/components/SubmitButton";
+import FieldsWrapper from "../../utils/components/FieldsWrapper";
 import Divider from "@mui/material/Divider";
+import Collection from "../../utils/abi/Collection";
+import { useParams } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 
-export default function CollectionPage() {
-  const { address } = useAccount();
+export default function MintForm() {
   const { address: contractAddress } = useParams<{ address: `0x${string}` }>();
-  const { data: signer } = useSigner();
-  const { chain } = useNetwork();
-
   const contractData = { address: contractAddress as string, abi: Collection };
-  const contract = useContract({
-    ...contractData,
-    signerOrProvider: signer,
-  });
-  const addRecentTransaction = useAddRecentTransaction();
-
-  const formContext = useForm<{ amount: string }>();
+  const { address } = useAccount();
 
   const {
     data: collectionInfo,
-    isFetched,
-    refetch,
+    isFetching,
+    refetch: refetchCollection,
+    isFetchedAfterMount,
   } = useContractReads({
     contracts: [
       {
@@ -73,6 +64,16 @@ export default function CollectionPage() {
         ...contractData,
         functionName: "owner",
       },
+      {
+        ...contractData,
+        functionName: "balanceOf",
+        args: [address ?? ethers.constants.AddressZero],
+      },
+      {
+        ...contractData,
+        functionName: "tokensOfOwner",
+        args: [address ?? ethers.constants.AddressZero],
+      },
     ],
     select: (data) => {
       return {
@@ -83,17 +84,26 @@ export default function CollectionPage() {
         maxSupply: Number(data[4]),
         userMintedAmount: Number(data[5]),
         owner: data[6],
+        address: contractAddress,
       };
     },
   });
-
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
+  const contract = useContract({
+    address: collectionInfo?.address,
+    abi: Collection,
+    signerOrProvider: signer,
+  });
+  const addRecentTransaction = useAddRecentTransaction();
+  const formContext = useForm<{ amount: string }>();
   const { data: contractBalance, refetch: refetchBalance } = useBalance({
-    address: contractAddress,
+    address: collectionInfo?.address,
   });
 
   const checkAmount = (mintAmount: Number) => {
     if (collectionInfo) {
-      if (mintAmount > collectionInfo.maxSupply - collectionInfo.totalMinted)
+      if (mintAmount > collectionInfo?.maxSupply - collectionInfo?.totalMinted)
         throw new Error("Not enough tokens left");
       else if (
         mintAmount >
@@ -114,7 +124,7 @@ export default function CollectionPage() {
       description: `Mint ${mintAmount} tokens of ${collectionInfo?.name}`,
     });
     const receipt = await tx?.wait();
-    refetch();
+    refetchCollection?.();
     refetchBalance();
     return receipt as ethers.ContractReceipt;
   };
@@ -136,25 +146,16 @@ export default function CollectionPage() {
         ).toString()
       );
   };
-
-  if (!isFetched || !contract || !collectionInfo)
+  if ((isFetching && !isFetchedAfterMount) || !collectionInfo)
     return (
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Nft minting page
-        </Typography>
-        <Typography variant="h5" sx={{ mt: "35vh" }}>
-          Fetching data
-          <CircularProgress size="30px" sx={{ ml: 2 }} />
-        </Typography>
-      </Box>
+      <Typography variant="h5" sx={{ my: "auto" }}>
+        Fetching data
+        <CircularProgress size="30px" sx={{ ml: 2 }} />
+      </Typography>
     );
   else
     return (
       <Box>
-        <Typography variant="h5" mb="25px">
-          Nft minting page
-        </Typography>
         <Container maxWidth="sm" sx={{ border: "1px solid black", p: 2 }}>
           <Stack textAlign={"center"} gap={2}>
             <Typography variant="h4">{collectionInfo?.name}</Typography>

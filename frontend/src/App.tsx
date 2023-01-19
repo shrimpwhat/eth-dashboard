@@ -2,7 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import IndexPage from "./pages/IndexPage";
 import NftMintPage from "./pages/NftMintPage";
 import { ToastContainer } from "react-toastify";
-import CollectionPage from "./pages/CollectionPage";
+import CollectionPage from "./pages/CollectionPage/";
 import TokenPage from "./pages/TokenPage";
 import TokenCreationPage from "./pages/TokenMintPage";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -29,7 +29,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import TollIcon from "@mui/icons-material/Toll";
 import ImageIcon from "@mui/icons-material/Image";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
 const App = () => {
   const theme = useTheme();
@@ -146,7 +145,6 @@ const App = () => {
             ["Home", "/", <HomeIcon color="primary" />],
             ["NFT", "/nft", <ImageIcon color="primary" />],
             ["ERC20", "/token", <TollIcon color="primary" />],
-            ["DEX", "/", <SwapHorizIcon color="primary" />],
           ].map((item, index) => (
             <ListItem key={index}>
               <ListItemButton component={Link} to={item[1] as string}>
