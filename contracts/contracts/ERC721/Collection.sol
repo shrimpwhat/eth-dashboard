@@ -10,7 +10,7 @@ contract Collection is ERC721ABurnable, ERC721AQueryable, Ownable {
     uint256 public immutable MAX_USER_LIMIT;
     uint256 public immutable MAX_SUPPLY;
     uint256 public immutable TOKEN_PRICE;
-    string private baseURI;
+    string public baseURI;
 
     constructor(
         string memory name,

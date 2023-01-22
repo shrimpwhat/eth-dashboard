@@ -19,7 +19,6 @@ const Index = () => {
           "Setup a staking contract for your collection with rewards in any token",
           "Create your own ERC-20 token",
           "Create a farming contract for your token",
-          "Provide a liquidity to your tokens and make them available for swaps",
         ].map((item, index) => (
           <ListItem key={index}>
             <ListItemText
