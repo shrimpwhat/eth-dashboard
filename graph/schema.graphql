@@ -1,0 +1,6 @@
+type TokenMetadata @entity {
+  id: ID!
+  collectionAddress: Bytes!
+  name: String!
+  image: String!
+}

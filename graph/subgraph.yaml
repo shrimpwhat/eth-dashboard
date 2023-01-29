@@ -1,0 +1,43 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: CollectionFactory
+    network: goerli
+    source:
+      address: "0xf7f7Dac62048abBF2E2f19fBe50401ce549919e2"
+      abi: CollectionFactory
+      startBlock: 8399472
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CollectionCreated
+      abis:
+        - name: CollectionFactory
+          file: ./abis/CollectionFactory.json
+      eventHandlers:
+        - event: CollectionCreated(address,address)
+          handler: handleCollectionCreated
+      file: ./src/collectionFactory.ts
+templates:
+  name: Collection
+  kind: ethereum/contract
+  network: goerli
+  source:
+    abi: Collection
+  mapping:
+    kind: ethereum/events
+    apiVersion: 0.0.7
+    language: wasm/assemblyscript
+    file: ./src/collection.ts
+    entities:
+      - TokenMetadata
+    abis:
+      - name: Collection
+        file: ./abis/Collection.json
+    eventHandlers:
+      - event: Transfer(address,address,uint256)
+        handler: handleMint
