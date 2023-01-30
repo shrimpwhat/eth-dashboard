@@ -100,14 +100,14 @@ export const deployedTokenAlert = (fn: Promise<string>) => {
   ));
 };
 
-export const txAlert = (text: string, fn: Promise<any>) => {
-  return basePromisePopup(fn, (data: string) => (
+export const txAlert = (text: string, fn: Promise<ethers.ContractReceipt>) => {
+  return basePromisePopup(fn, (data: ethers.ContractReceipt) => (
     <Box>
       <Typography variant="body2">{text}</Typography>
       <Link
         target="_blank"
         rel="noreferrer"
-        href={`https://goerli.etherscan.io/tx/${data}`}
+        href={`https://goerli.etherscan.io/tx/${data.transactionHash}`}
       >
         View on Explorer
       </Link>
@@ -116,7 +116,7 @@ export const txAlert = (text: string, fn: Promise<any>) => {
 };
 
 export const nftMintAlert = (fn: Promise<ethers.ContractReceipt>) => {
-  basePromisePopup(fn, (data: ethers.ContractReceipt) => (
+  return basePromisePopup(fn, (data: ethers.ContractReceipt) => (
     <Box>
       <Typography variant="body2">
         Nft successfuly minted! Check it at Opensea:

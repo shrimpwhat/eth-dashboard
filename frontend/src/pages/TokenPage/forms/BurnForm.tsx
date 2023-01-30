@@ -23,16 +23,15 @@ const BurnForm = () => {
         tokenData?.symbol
       }`,
     });
-    await tx.wait();
+    await txAlert(
+      `Successfully burned ${amount} ${tokenData?.symbol}`,
+      tx.wait()
+    );
     refetch();
-    return tx.hash;
   };
 
   const handleBurn = ({ amount }: { amount: string }) => {
-    txAlert(
-      `Successfully burned ${amount} ${tokenData?.symbol}`,
-      burnTokens(ethers.utils.parseEther(amount))
-    );
+    burnTokens(ethers.utils.parseEther(amount));
   };
 
   return (

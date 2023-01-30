@@ -29,16 +29,12 @@ const ApproveForm = () => {
       hash: tx.hash,
       description: `Approve ${tokenData?.symbol}`,
     });
-    await tx.wait();
+    await txAlert(`Successfully approved ${tokenData?.symbol}`, tx.wait());
     refetch();
-    return tx.hash;
   };
 
   const handleApprove = (data: FormData) => {
-    txAlert(
-      `Successfully approved ${tokenData?.symbol}`,
-      approveTokens(data.address, ethers.utils.parseEther(data.amount))
-    );
+    approveTokens(data.address, ethers.utils.parseEther(data.amount));
   };
 
   return (

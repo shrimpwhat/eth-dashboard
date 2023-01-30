@@ -50,6 +50,16 @@ const MintSingleNft = () => {
   };
   const [imageSrc, readImage] = useState("/no-image.png");
 
+  useEffect(() => {
+    if (image) {
+      const reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = (e) => {
+        readImage((e.target?.result as string) ?? "/no-image.png");
+      };
+    }
+  }, [image]);
+
   const uploadImage = async () => {
     const formData = new NodeFormData();
     formData.append("file", image);
@@ -101,28 +111,19 @@ const MintSingleNft = () => {
 
   const writeContract = async (metadata: string) => {
     const tx = await contract?.mint("ipfs://" + metadata);
-    addRecentTransaction({
-      hash: tx?.hash ?? ethers.constants.HashZero,
-      description: "Mint single nft",
-    });
-    const receipt = await tx?.wait();
-    return receipt as ethers.ContractReceipt;
+    if (tx) {
+      addRecentTransaction({
+        hash: tx.hash,
+        description: "Mint single nft",
+      });
+      await nftMintAlert(tx?.wait());
+    }
   };
 
   const mint = async (formData: FormProps) => {
     const metadata = await ipfsAlert(getMetadata(formData));
-    nftMintAlert(writeContract(metadata));
+    writeContract(metadata);
   };
-
-  useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.readAsDataURL(image);
-      reader.onload = (e) => {
-        readImage((e.target?.result as string) ?? "/no-image.png");
-      };
-    }
-  }, [image]);
 
   return (
     <Box

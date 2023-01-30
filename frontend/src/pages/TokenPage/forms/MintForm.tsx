@@ -29,17 +29,15 @@ const MintForm = () => {
         tokenData?.symbol
       }`,
     });
-    await tx.wait();
+    await txAlert(
+      `Successfully minted ${amount} ${tokenData?.symbol}`,
+      tx.wait()
+    );
     refetch?.();
-    return tx.hash;
   };
 
   const handleMint = (data: FormData) => {
-    console.log(data);
-    txAlert(
-      `Successfully minted ${data.amount} ${tokenData?.symbol}`,
-      mintTokens(data.address, ethers.utils.parseEther(data.amount))
-    );
+    mintTokens(data.address, ethers.utils.parseEther(data.amount));
   };
 
   if (tokenData?.owner !== address) return null;

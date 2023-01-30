@@ -101,7 +101,7 @@ export default function MintForm() {
     address: collectionInfo?.address,
   });
 
-  const checkAmount = (mintAmount: Number) => {
+  const checkAmount = (mintAmount: number) => {
     if (collectionInfo) {
       if (mintAmount > collectionInfo?.maxSupply - collectionInfo?.totalMinted)
         throw new Error("Not enough tokens left");
@@ -119,21 +119,28 @@ export default function MintForm() {
     const tx = await contract?.mint(BigNumber.from(mintAmount), {
       value: collectionInfo?.price.mul(mintAmount),
     });
-    addRecentTransaction({
-      hash: tx?.hash ?? "",
-      description: `Mint ${mintAmount} tokens of ${collectionInfo?.name}`,
-    });
-    const receipt = await tx?.wait();
-    refetchCollection?.();
-    refetchBalance();
-    return receipt as ethers.ContractReceipt;
+    if (tx) {
+      addRecentTransaction({
+        hash: tx.hash,
+        description: `Mint ${mintAmount} tokens of ${collectionInfo?.name}`,
+      });
+      await nftMintAlert(tx?.wait());
+      refetchCollection?.();
+      refetchBalance();
+    }
   };
 
   const withdraw = async () => {
     const tx = await contract?.withdraw();
-    const receipt = await tx?.wait();
-    refetchBalance();
-    return receipt?.transactionHash;
+    if (tx) {
+      addRecentTransaction({
+        hash: tx.hash,
+        description: `Withdrawn mint costs from ${collectionInfo?.name}`,
+      });
+
+      await txAlert("Funds successfuly withdrawn!", tx.wait());
+      refetchBalance();
+    }
   };
 
   const setMaxAmount = () => {
@@ -205,7 +212,7 @@ export default function MintForm() {
                 ) : (
                   <FormContainer
                     formContext={formContext}
-                    onSuccess={(data) => nftMintAlert(mint(data))}
+                    onSuccess={(data) => mint(data)}
                   >
                     <FieldsWrapper>
                       <Box display="flex" justifyContent="center" width="100%">
@@ -263,12 +270,7 @@ export default function MintForm() {
                   </Box>
                 </Typography>
                 <Box>
-                  <Button
-                    onClick={() => {
-                      txAlert("Funds successfuly withdrawn!", withdraw());
-                    }}
-                    variant="outlined"
-                  >
+                  <Button onClick={withdraw} variant="outlined">
                     Withdraw
                   </Button>
                 </Box>

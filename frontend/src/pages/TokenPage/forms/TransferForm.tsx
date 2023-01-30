@@ -31,16 +31,15 @@ const TransferForm = () => {
         tokenData?.symbol
       }`,
     });
-    await tx.wait();
+    await txAlert(
+      `Successfully transfered ${amount} ${tokenData?.symbol}`,
+      tx.wait()
+    );
     refetch?.();
-    return tx.hash;
   };
 
   const handleTransfer = (data: FormData) => {
-    txAlert(
-      `Successfully transfered ${data.amount} ${tokenData?.symbol}`,
-      transferTokens(data.address, ethers.utils.parseEther(data.amount))
-    );
+    transferTokens(data.address, ethers.utils.parseEther(data.amount));
   };
 
   return (

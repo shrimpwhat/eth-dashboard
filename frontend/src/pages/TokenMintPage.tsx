@@ -10,12 +10,14 @@ import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import FieldsWrapper from "../utils/components/FieldsWrapper";
 import SubmitButton from "../utils/components/SubmitButton";
 
+const ERC20_FACTORY_ADDRESS = process.env.REACT_APP_ERC20_FACTORY as string;
+
 export default function TokenCreationPage() {
   const { data: signer } = useSigner();
   const addRecentTransaction = useAddRecentTransaction();
 
   const contract = useContract({
-    address: process.env.REACT_APP_TOKEN_FACTORY as string,
+    address: ERC20_FACTORY_ADDRESS,
     abi: TokenFactoryAbi,
     signerOrProvider: signer,
   });
@@ -32,17 +34,15 @@ export default function TokenCreationPage() {
       symbol,
       ethers.utils.parseEther(supply)
     );
-    addRecentTransaction({
-      hash: tx?.hash ?? ethers.constants.HashZero,
-      description: `Create token ${name}`,
-    });
-    const receipt = await tx?.wait();
-    const tokenAddress = receipt?.events?.at(3)?.args?.tokenAddress;
-    return tokenAddress;
-  };
-
-  const handleSubmit = async (data: FormData) => {
-    deployedTokenAlert(createToken(data));
+    if (tx) {
+      addRecentTransaction({
+        hash: tx?.hash ?? ethers.constants.HashZero,
+        description: `Create token ${name}`,
+      });
+      deployedTokenAlert(
+        tx.wait().then((receipt) => receipt?.events?.at(3)?.args?.tokenAddress)
+      );
+    }
   };
 
   return (
@@ -52,7 +52,7 @@ export default function TokenCreationPage() {
       </Typography>
       <Box>
         <FindContract url="/token/" text={"Token address"} />
-        <FormContainer onSuccess={handleSubmit}>
+        <FormContainer onSuccess={createToken}>
           <FieldsWrapper>
             <TextFieldElement label="Name" name="name" required fullWidth />
             <TextFieldElement label="Symbol" name="symbol" required fullWidth />

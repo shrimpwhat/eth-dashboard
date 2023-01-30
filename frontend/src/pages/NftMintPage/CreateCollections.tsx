@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 
-const contractAddress = process.env.REACT_APP_NFT_FACTORY_ADDRESS as string;
+const contractAddress = process.env.REACT_APP_NFT_FACTORY as string;
 const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
 
 interface FormData {
@@ -157,17 +157,23 @@ const CreateCollection = () => {
       data.price,
       data.uri
     );
-    const receipt = await tx?.wait();
-    addRecentTransaction({
-      hash: tx?.hash ?? ethers.constants.HashZero,
-      description: `Create collection ${data.name}`,
-    });
-    return receipt?.events?.[2]?.args?.collectionAddress;
+    if (tx) {
+      addRecentTransaction({
+        hash: tx?.hash ?? ethers.constants.HashZero,
+        description: `Create collection ${data.name}`,
+      });
+      deployedCollectionAlert(
+        tx
+          .wait()
+          .then((receipt) => receipt?.events?.[2]?.args?.collectionAddress)
+      );
+      return;
+    }
   };
 
   const createCollection = async (data: FormData) => {
     const args = await processData(data);
-    deployedCollectionAlert(writeContract(args));
+    writeContract(args);
   };
 
   const handleSubmit = async (data: FormData) => {

@@ -5,6 +5,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import "react-toastify/dist/ReactToastify.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { goerli, configureChains, createClient, WagmiConfig } from "wagmi";
+import { hardhat } from "@wagmi/core/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -14,7 +15,7 @@ import { BrowserRouter } from "react-router-dom";
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const { chains, provider } = configureChains(
-  [goerli],
+  [goerli, hardhat],
   [
     alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY as string }),
     publicProvider(),
@@ -58,7 +59,7 @@ root.render(
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider
         chains={chains}
-        initialChain={goerli}
+        // initialChain={goerli}
         showRecentTransactions={true}
       >
         <ThemeProvider theme={theme}>

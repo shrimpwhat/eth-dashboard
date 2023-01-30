@@ -47,6 +47,9 @@ const StakingDataContext = createContext<StakingContext>({
 });
 export { StakingDataContext };
 
+const STAKING_FACTORY_ADDRESS = process.env
+  .REACT_APP_ERC20_STAKING_FACTORY as string;
+
 const StakingForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
   const { tokenData, token } = useContext(TokenContext);
@@ -54,7 +57,7 @@ const StakingForm = () => {
   const { data: signer } = useSigner();
 
   const factoryData = {
-    address: process.env.REACT_APP_ERC20_STAKING_FACTORY as string,
+    address: STAKING_FACTORY_ADDRESS,
     abi: stakignFactoryABI,
   };
   const factoryContract = useContract({
@@ -130,28 +133,15 @@ const StakingForm = () => {
       stakingContract?.address,
       ethers.constants.MaxUint256
     );
+    addRecentTransaction({
+      hash: tx?.hash,
+      description: `Approved ${tokenData?.symbol} for staking contract`,
+    });
     await txAlert(
       `Approved ${tokenData?.symbol} for staking contract`,
       tx.wait()
     );
     refetchAllowance?.();
-    addRecentTransaction({
-      hash: tx?.hash,
-      description: `Approved ${tokenData?.symbol} for staking contract`,
-    });
-  };
-
-  const handleReceipt = (
-    receipt: ethers.ContractReceipt | undefined,
-    description: string
-  ) => {
-    if (receipt) {
-      addRecentTransaction({
-        hash: receipt.transactionHash,
-        description,
-      });
-      return receipt?.transactionHash;
-    } else throw new Error("Tx receipt is undefined");
   };
 
   const setupStakingContract = async () => {
@@ -159,9 +149,14 @@ const StakingForm = () => {
       tokenData?.address as `0x${string}`,
       BigNumber.from(365 * 86400)
     );
-    const receipt = await tx?.wait();
-    refetch();
-    handleReceipt(receipt, `Deployed staking contract for ${tokenData?.name}`);
+    if (tx) {
+      addRecentTransaction({
+        hash: tx?.hash,
+        description: `Deployed staking contract for ${tokenData?.name}`,
+      });
+      await txAlert("Staking contract successfuly deployed", tx.wait());
+      refetch();
+    }
   };
 
   if (stakingAddress === ethers.constants.AddressZero) {
@@ -173,15 +168,7 @@ const StakingForm = () => {
           <Typography variant="h6" sx={{ mb: 1 }}>
             Staking contract hasn't been setup yet
           </Typography>
-          <Button
-            variant="outlined"
-            onClick={() =>
-              txAlert(
-                "Staking contract successfuly deployed",
-                setupStakingContract()
-              )
-            }
-          >
+          <Button variant="outlined" onClick={setupStakingContract}>
             Setup
           </Button>
         </Box>
