@@ -8,12 +8,14 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { StakingDataContext } from ".";
 import floatValue from "../../../../utils/components/FloatValue";
+import { useNetwork } from "wagmi";
 
 const RecentStake = () => {
   const { tokenData, refetch: refetchBalance } = useContext(TokenContext);
   const { stakingData, refetchStaking, stakingContract } =
     useContext(StakingDataContext);
   const addRecentTransaction = useAddRecentTransaction();
+  const { chain } = useNetwork();
 
   const claim = async () => {
     const tx = await stakingContract?.getReward();
@@ -24,7 +26,8 @@ const RecentStake = () => {
       });
       await txAlert(
         `Claimed rewards from ${tokenData?.symbol} staking`,
-        tx.wait()
+        tx.wait(),
+        chain?.blockExplorers?.default?.url
       );
       refetchStaking?.();
       refetchBalance?.();
@@ -40,7 +43,8 @@ const RecentStake = () => {
       });
       await txAlert(
         `Compound rewards from ${tokenData?.symbol} staking`,
-        tx.wait()
+        tx.wait(),
+        chain?.blockExplorers?.default?.url
       );
       refetchStaking?.();
     }

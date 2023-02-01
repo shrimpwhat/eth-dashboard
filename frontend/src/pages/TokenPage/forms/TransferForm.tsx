@@ -9,6 +9,7 @@ import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import MaxValueInput from "../../../utils/components/MaxValueInput";
+import { useNetwork } from "wagmi";
 
 interface FormData {
   address: string;
@@ -19,7 +20,7 @@ const TransferForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
   const { token, tokenData, refetch } = useContext(TokenContext);
   const formContext = useForm<FormData>();
-
+  const { chain } = useNetwork();
   const transferTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.transfer(
       address,
@@ -33,7 +34,8 @@ const TransferForm = () => {
     });
     await txAlert(
       `Successfully transfered ${amount} ${tokenData?.symbol}`,
-      tx.wait()
+      tx.wait(),
+      chain?.blockExplorers?.default.url
     );
     refetch?.();
   };

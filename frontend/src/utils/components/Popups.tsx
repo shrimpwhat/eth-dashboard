@@ -100,14 +100,18 @@ export const deployedTokenAlert = (fn: Promise<string>) => {
   ));
 };
 
-export const txAlert = (text: string, fn: Promise<ethers.ContractReceipt>) => {
+export const txAlert = (
+  text: string,
+  fn: Promise<ethers.ContractReceipt>,
+  explorer?: string
+) => {
   return basePromisePopup(fn, (data: ethers.ContractReceipt) => (
     <Box>
       <Typography variant="body2">{text}</Typography>
       <Link
         target="_blank"
         rel="noreferrer"
-        href={`https://goerli.etherscan.io/tx/${data.transactionHash}`}
+        href={`${explorer}/tx/${data.transactionHash}`}
       >
         View on Explorer
       </Link>

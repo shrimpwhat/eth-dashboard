@@ -6,7 +6,6 @@ import FieldsWrapper from "../../utils/components/FieldsWrapper";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import NodeFormData from "form-data";
 import axios from "axios";
-
 import {
   FormContainer,
   TextFieldElement,
@@ -20,7 +19,6 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import SubmitButton from "../../utils/components/SubmitButton";
-import { ethers } from "ethers";
 
 interface FormProps {
   name: string;
@@ -29,10 +27,12 @@ interface FormProps {
 }
 
 const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
+const NFT_MINTER_ADDRESS = process.env.REACT_APP_NFT_MINTER;
+
 const MintSingleNft = () => {
   const { data: signer } = useSigner();
   const contract = useContract({
-    address: process.env.REACT_APP_NFT_MINTER_ADDRESS as string,
+    address: NFT_MINTER_ADDRESS,
     abi: NftMinterInterface,
     signerOrProvider: signer,
   });
@@ -145,6 +145,9 @@ const MintSingleNft = () => {
             label="Image"
             InputLabelProps={{
               shrink: true,
+            }}
+            inputProps={{
+              accept: "image/*",
             }}
             onChange={changeImage}
             required

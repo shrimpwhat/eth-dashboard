@@ -1,5 +1,5 @@
 import { ethers, BigNumber } from "ethers";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { txAlert } from "../../../utils/components/Popups";
 import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -20,7 +20,7 @@ const MintForm = () => {
   const { token, tokenData, refetch } = useContext(TokenContext);
   const addRecentTransaction = useAddRecentTransaction();
   const formContext = useForm<FormData>();
-
+  const { chain } = useNetwork();
   const mintTokens = async (address: string, amount: BigNumber) => {
     const tx: ethers.ContractTransaction = await token?.mintTo(address, amount);
     addRecentTransaction({
@@ -31,7 +31,8 @@ const MintForm = () => {
     });
     await txAlert(
       `Successfully minted ${amount} ${tokenData?.symbol}`,
-      tx.wait()
+      tx.wait(),
+      chain?.blockExplorers?.default.url
     );
     refetch?.();
   };

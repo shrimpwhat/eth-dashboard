@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 
-const contractAddress = process.env.REACT_APP_NFT_FACTORY as string;
+const contractAddress = process.env.REACT_APP_COLLECTION_FACTORY;
 const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
 
 interface FormData {

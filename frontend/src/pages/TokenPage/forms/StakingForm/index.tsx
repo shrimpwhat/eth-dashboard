@@ -6,6 +6,7 @@ import {
   useAccount,
   useContract,
   useSigner,
+  useNetwork,
 } from "wagmi";
 import { TokenContext } from "../..";
 import ERC20ABI from "../../../../utils/abi/ERC20";
@@ -18,10 +19,13 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import DepositWithdraw from "./DepositWithdraw";
 import OwnerActions from "./OwnerActions";
 import RecentStake from "./RecentStake";
 import StakingStats from "./Stats";
+import Link from "@mui/material/Link";
 
 interface StakingData {
   address?: string;
@@ -55,6 +59,7 @@ const StakingForm = () => {
   const { tokenData, token } = useContext(TokenContext);
   const { address } = useAccount();
   const { data: signer } = useSigner();
+  const { chain } = useNetwork();
 
   const factoryData = {
     address: STAKING_FACTORY_ADDRESS,
@@ -139,7 +144,8 @@ const StakingForm = () => {
     });
     await txAlert(
       `Approved ${tokenData?.symbol} for staking contract`,
-      tx.wait()
+      tx.wait(),
+      chain?.blockExplorers?.default?.url
     );
     refetchAllowance?.();
   };
@@ -154,7 +160,11 @@ const StakingForm = () => {
         hash: tx?.hash,
         description: `Deployed staking contract for ${tokenData?.name}`,
       });
-      await txAlert("Staking contract successfuly deployed", tx.wait());
+      await txAlert(
+        "Staking contract successfuly deployed",
+        tx.wait(),
+        chain?.blockExplorers?.default?.url
+      );
       refetch();
     }
   };
@@ -193,7 +203,30 @@ const StakingForm = () => {
             <RecentStake />
             <DepositWithdraw />
             <OwnerActions address={address} />
-            {/* <p className="text-lg text-left">Contract: {stakingAddress}</p> */}
+            <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    stakingAddress ?? ethers.constants.AddressZero
+                  )
+                }
+              >
+                Contract Address
+                <ContentCopyIcon sx={{ fontSize: 15 }} />
+              </Button>
+              <Button variant="outlined" size="small">
+                <Link
+                  target="_blank"
+                  rel="noreferrer"
+                  underline="none"
+                  href={`${chain?.blockExplorers?.default}/address/${stakingAddress}`}
+                >
+                  Explorer <ArrowOutwardIcon sx={{ fontSize: 15 }} />
+                </Link>
+              </Button>
+            </Box>
           </Stack>
         </StakingDataContext.Provider>
       );

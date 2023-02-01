@@ -10,6 +10,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import { FormContainer } from "react-hook-form-mui";
 import Container from "@mui/material/Container";
 import { StakingDataContext } from ".";
+import { useNetwork } from "wagmi";
 
 const DepositWithdraw = () => {
   const [type, setType] = useState<"deposit" | "withdraw">("deposit");
@@ -19,6 +20,7 @@ const DepositWithdraw = () => {
   ) => {
     if (newType !== null) setType(newType);
   };
+  const { chain } = useNetwork();
   const addRecentTransaction = useAddRecentTransaction();
 
   const { tokenData, refetch: refetchBalance } = useContext(TokenContext);
@@ -34,7 +36,11 @@ const DepositWithdraw = () => {
         hash: tx?.hash,
         description: `Stake ${amount} ${tokenData?.symbol}`,
       });
-      await txAlert(`Stake ${amount} ${tokenData?.symbol}`, tx.wait());
+      await txAlert(
+        `Stake ${amount} ${tokenData?.symbol}`,
+        tx.wait(),
+        chain?.blockExplorers?.default.url
+      );
       refetchStaking?.();
       refetchBalance?.();
     }
@@ -51,7 +57,8 @@ const DepositWithdraw = () => {
       });
       await txAlert(
         `Withdraw ${amount} ${tokenData?.symbol} from staking`,
-        tx.wait()
+        tx.wait(),
+        chain?.blockExplorers?.default.url
       );
       refetchStaking?.();
       refetchBalance?.();

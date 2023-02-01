@@ -8,10 +8,11 @@ import Divider from "@mui/material/Divider";
 import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import InputAdornment from "@mui/material/InputAdornment";
 import Button from "@mui/material/Button";
+import { useNetwork } from "wagmi";
 
 const BurnForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
-
+  const { chain } = useNetwork();
   const { token, tokenData, refetch } = useContext(TokenContext);
   const formContext = useForm<{ amount: string }>();
 
@@ -25,7 +26,8 @@ const BurnForm = () => {
     });
     await txAlert(
       `Successfully burned ${amount} ${tokenData?.symbol}`,
-      tx.wait()
+      tx.wait(),
+      chain?.blockExplorers?.default.url
     );
     refetch();
   };

@@ -11,12 +11,14 @@ import Divider from "@mui/material/Divider";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Container from "@mui/material/Container";
 import { StakingDataContext } from ".";
+import { useNetwork } from "wagmi";
 
 const OwnerActions = ({ address }: { address?: string }) => {
   const { tokenData } = useContext(TokenContext);
   const { stakingData, allowance, approve, stakingContract, refetchStaking } =
     useContext(StakingDataContext);
   const addRecentTransaction = useAddRecentTransaction();
+  const { chain } = useNetwork();
 
   const startPeriod = async ({ amount }: { amount: string }) => {
     const tx = await stakingContract?.notifyRewardAmount(
@@ -29,7 +31,8 @@ const OwnerActions = ({ address }: { address?: string }) => {
       });
       await txAlert(
         `Started new reward period of ${tokenData?.symbol} staking`,
-        tx.wait()
+        tx.wait(),
+        chain?.blockExplorers?.default.url
       );
       refetchStaking?.();
     }
@@ -44,7 +47,8 @@ const OwnerActions = ({ address }: { address?: string }) => {
       });
       await txAlert(
         `Updated duration in ${tokenData?.symbol} staking`,
-        tx.wait()
+        tx.wait(),
+        chain?.blockExplorers?.default.url
       );
       refetchStaking?.();
     }

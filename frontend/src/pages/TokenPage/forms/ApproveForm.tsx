@@ -9,6 +9,7 @@ import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
 import MaxValueInput from "../../../utils/components/MaxValueInput";
 import Grid from "@mui/material/Grid";
+import { useNetwork } from "wagmi";
 
 interface FormData {
   address: string;
@@ -17,7 +18,7 @@ interface FormData {
 
 const ApproveForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
-
+  const { chain } = useNetwork();
   const { token, tokenData, refetch } = useContext(TokenContext);
 
   const approveTokens = async (address: string, amount: BigNumber) => {
@@ -29,7 +30,11 @@ const ApproveForm = () => {
       hash: tx.hash,
       description: `Approve ${tokenData?.symbol}`,
     });
-    await txAlert(`Successfully approved ${tokenData?.symbol}`, tx.wait());
+    await txAlert(
+      `Successfully approved ${tokenData?.symbol}`,
+      tx.wait(),
+      chain?.blockExplorers?.default.url
+    );
     refetch();
   };
 
