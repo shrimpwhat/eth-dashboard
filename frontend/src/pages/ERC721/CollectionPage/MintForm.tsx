@@ -6,7 +6,7 @@ import {
   useBalance,
   useContractReads,
 } from "wagmi";
-import { nftMintAlert, txAlert } from "../../utils/components/Popups";
+import { nftMintAlert, txAlert } from "../../../utils/components/Popups";
 import { ethers, BigNumber } from "ethers";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
@@ -16,10 +16,10 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
-import SubmitButton from "../../utils/components/SubmitButton";
-import FieldsWrapper from "../../utils/components/FieldsWrapper";
+import SubmitButton from "../../../utils/components/SubmitButton";
+import FieldsWrapper from "../../../utils/components/FieldsWrapper";
 import Divider from "@mui/material/Divider";
-import Collection from "../../utils/abi/Collection";
+import Collection from "../../../utils/abi/Collection";
 import { useParams } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 

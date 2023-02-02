@@ -1,13 +1,13 @@
 import { ethers } from "ethers";
 import { useContext } from "react";
-import { TokenContext } from "../..";
-import { txAlert } from "../../../../utils/components/Popups";
+import { TokenContext } from "../TokenPage";
+import { txAlert } from "../../../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { StakingDataContext } from ".";
-import floatValue from "../../../../utils/components/FloatValue";
+import floatValue from "../../../utils/components/FloatValue";
 import { useNetwork } from "wagmi";
 
 const RecentStake = () => {

@@ -1,5 +1,5 @@
 import { ethers, BigNumber } from "ethers";
-import { useContext, createContext } from "react";
+import { createContext } from "react";
 import {
   useContractRead,
   useContractReads,
@@ -8,11 +8,10 @@ import {
   useSigner,
   useNetwork,
 } from "wagmi";
-import { TokenContext } from "../..";
-import ERC20ABI from "../../../../utils/abi/ERC20";
-import stakignFactoryABI from "../../../../utils/abi/ERC20StakingFactory";
-import stakingABI from "../../../../utils/abi/ERC20Staking";
-import { txAlert } from "../../../../utils/components/Popups";
+import ERC20ABI from "../../../utils/abi/ERC20";
+import stakignFactoryABI from "../../../utils/abi/ERC20StakingFactory";
+import stakingABI from "../../../utils/abi/ERC20Staking";
+import { txAlert } from "../../../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -26,6 +25,15 @@ import OwnerActions from "./OwnerActions";
 import RecentStake from "./RecentStake";
 import StakingStats from "./Stats";
 import Link from "@mui/material/Link";
+import { red } from "@mui/material/colors";
+import {
+  FormContainer,
+  TextFieldElement,
+  useForm,
+  useWatch,
+} from "react-hook-form-mui";
+import FieldsWrapper from "../../../utils/components/FieldsWrapper";
+import Container from "@mui/material/Container";
 
 interface StakingData {
   address?: string;
@@ -51,15 +59,70 @@ const StakingDataContext = createContext<StakingContext>({
 });
 export { StakingDataContext };
 
-const STAKING_FACTORY_ADDRESS = process.env
-  .REACT_APP_ERC20_STAKING_FACTORY as string;
+const STAKING_FACTORY_ADDRESS = process.env.REACT_APP_ERC20_STAKING_FACTORY;
 
-const StakingForm = () => {
+const Page = () => {
+  const formContext = useForm();
+  const address = useWatch({ name: "address", control: formContext.control });
+
+  return (
+    <>
+      <FormContainer formContext={formContext}>
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: "flex",
+            gap: 4,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            flexDirection: "row",
+          }}
+        >
+          <TextFieldElement
+            name="address"
+            label="Token contract address"
+            helperText="Paste a ERC20 token contract which has already deployed stakingContract"
+            fullWidth
+            validation={{
+              validate: (s) =>
+                ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
+            }}
+          />
+          <Button variant="contained">Find</Button>
+        </Container>
+      </FormContainer>
+      <Divider sx={{ my: 4 }} />
+      {formContext.formState.isValid && <StakingForm tokenAddress={address} />}
+    </>
+  );
+};
+
+const StakingForm = ({ tokenAddress }: { tokenAddress: string }) => {
   const addRecentTransaction = useAddRecentTransaction();
-  const { tokenData, token } = useContext(TokenContext);
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const { chain } = useNetwork();
+
+  const tokenContractData = {
+    address: tokenAddress,
+    abi: ERC20ABI,
+  };
+  const { data: tokenData } = useContractReads({
+    contracts: [
+      { ...tokenContractData, functionName: "name" },
+      { ...tokenContractData, functionName: "symbol" },
+      { ...tokenContractData, functionName: "owner" },
+    ],
+    select: (data) => ({
+      name: data?.at(0),
+      symbol: data?.at(1),
+      owner: data?.at(2),
+    }),
+  });
+  const token = useContract({
+    ...tokenContractData,
+    signerOrProvider: signer,
+  });
 
   const factoryData = {
     address: STAKING_FACTORY_ADDRESS,
@@ -72,9 +135,7 @@ const StakingForm = () => {
   const { data: stakingAddress, refetch } = useContractRead({
     ...factoryData,
     functionName: "tokenStakings",
-    args: [
-      (tokenData?.address as `0x${string}`) ?? ethers.constants.AddressZero,
-    ],
+    args: [(tokenAddress as `0x${string}`) ?? ethers.constants.AddressZero],
   });
 
   const stakingContractData = {
@@ -123,7 +184,7 @@ const StakingForm = () => {
   });
 
   const { data: allowance, refetch: refetchAllowance } = useContractRead({
-    address: tokenData?.address,
+    address: tokenAddress,
     abi: ERC20ABI,
     functionName: "allowance",
     args: [
@@ -135,24 +196,26 @@ const StakingForm = () => {
 
   const approve = async () => {
     const tx = await token?.approve(
-      stakingContract?.address,
+      stakingContract?.address ?? ethers.constants.AddressZero,
       ethers.constants.MaxUint256
     );
-    addRecentTransaction({
-      hash: tx?.hash,
-      description: `Approved ${tokenData?.symbol} for staking contract`,
-    });
-    await txAlert(
-      `Approved ${tokenData?.symbol} for staking contract`,
-      tx.wait(),
-      chain?.blockExplorers?.default?.url
-    );
-    refetchAllowance?.();
+    if (tx) {
+      addRecentTransaction({
+        hash: tx?.hash,
+        description: `Approved ${tokenData?.symbol} for staking contract`,
+      });
+      await txAlert(
+        `Approved ${tokenData?.symbol} for staking contract`,
+        tx.wait(),
+        chain?.blockExplorers?.default?.url
+      );
+      refetchAllowance?.();
+    }
   };
 
   const setupStakingContract = async () => {
     const tx = await factoryContract?.createPool(
-      tokenData?.address as `0x${string}`,
+      tokenAddress as `0x${string}`,
       BigNumber.from(365 * 86400)
     );
     if (tx) {
@@ -233,4 +296,4 @@ const StakingForm = () => {
   }
 };
 
-export default StakingForm;
+export default Page;

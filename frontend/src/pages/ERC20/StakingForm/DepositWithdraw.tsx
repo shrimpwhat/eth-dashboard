@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
 import { useContext, useState } from "react";
-import { TokenContext } from "../..";
-import { txAlert } from "../../../../utils/components/Popups";
-import MaxBalanceInput from "../../../../utils/components/MaxValueInput";
+import { TokenContext } from "../TokenPage";
+import { txAlert } from "../../../utils/components/Popups";
+import MaxBalanceInput from "../../../utils/components/MaxValueInput";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Button from "@mui/material/Button";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";

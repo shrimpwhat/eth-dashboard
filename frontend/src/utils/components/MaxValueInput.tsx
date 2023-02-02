@@ -4,7 +4,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import { ethers } from "ethers";
 import { useContext } from "react";
 import { TextFieldElement, useFormContext } from "react-hook-form-mui";
-import { TokenContext } from "../../pages/TokenPage";
+import { TokenContext } from "../../pages/ERC20/TokenPage";
 
 export default function Input({
   label,

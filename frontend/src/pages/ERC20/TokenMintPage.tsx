@@ -1,14 +1,14 @@
-import FindContract from "../utils/components/FindContract";
+import FindContract from "../../utils/components/FindContract";
 import { useContract, useSigner } from "wagmi";
-import TokenFactoryAbi from "../utils/abi/TokenFactory";
+import TokenFactoryAbi from "../../utils/abi/TokenFactory";
 import { ethers } from "ethers";
-import { deployedTokenAlert } from "../utils/components/Popups";
+import { deployedTokenAlert } from "../../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
-import FieldsWrapper from "../utils/components/FieldsWrapper";
-import SubmitButton from "../utils/components/SubmitButton";
+import FieldsWrapper from "../../utils/components/FieldsWrapper";
+import SubmitButton from "../../utils/components/SubmitButton";
 
 const ERC20_FACTORY_ADDRESS = process.env.REACT_APP_ERC20_FACTORY as string;
 

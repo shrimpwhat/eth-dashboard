@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { useContext } from "react";
-import floatValue from "../../../../utils/components/FloatValue";
-import { TokenContext } from "../..";
+import floatValue from "../../../utils/components/FloatValue";
+import { TokenContext } from "../TokenPage";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { StakingDataContext } from ".";

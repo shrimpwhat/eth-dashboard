@@ -7,17 +7,11 @@ import {
   useSigner,
   useContractReads,
 } from "wagmi";
-import abi from "../../utils/abi/ERC20";
+import abi from "../../../utils/abi/ERC20";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { createContext } from "react";
-import {
-  TransferForm,
-  MintForm,
-  ApproveForm,
-  BurnForm,
-  StakingForm,
-} from "./forms";
-import floatValue from "../../utils/components/FloatValue";
+import { TransferForm, MintForm, ApproveForm, BurnForm } from "./forms";
+import floatValue from "../../../utils/components/FloatValue";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -134,7 +128,6 @@ export default function TokenPage() {
                   <TransferForm />
                   <ApproveForm />
                   <BurnForm />
-                  <StakingForm />
                 </TokenContext.Provider>
               </>
             ) : (

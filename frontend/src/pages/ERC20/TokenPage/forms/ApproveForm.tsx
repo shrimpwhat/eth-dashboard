@@ -1,14 +1,14 @@
 import { ethers, BigNumber } from "ethers";
-import { txAlert } from "../../../utils/components/Popups";
+import { txAlert } from "../../../../utils/components/Popups";
 import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
-import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
-import { FormContainer, TextFieldElement, useForm } from "react-hook-form-mui";
+import Divider from "@mui/material/Divider";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
+import MaxValueInput from "../../../../utils/components/MaxValueInput";
 import Grid from "@mui/material/Grid";
-import MaxValueInput from "../../../utils/components/MaxValueInput";
 import { useNetwork } from "wagmi";
 
 interface FormData {
@@ -16,42 +16,40 @@ interface FormData {
   amount: string;
 }
 
-const TransferForm = () => {
+const ApproveForm = () => {
   const addRecentTransaction = useAddRecentTransaction();
-  const { token, tokenData, refetch } = useContext(TokenContext);
-  const formContext = useForm<FormData>();
   const { chain } = useNetwork();
-  const transferTokens = async (address: string, amount: BigNumber) => {
-    const tx: ethers.ContractTransaction = await token?.transfer(
+  const { token, tokenData, refetch } = useContext(TokenContext);
+
+  const approveTokens = async (address: string, amount: BigNumber) => {
+    const tx: ethers.ContractTransaction = await token?.approve(
       address,
       amount
     );
     addRecentTransaction({
       hash: tx.hash,
-      description: `Transfer ${ethers.utils.formatUnits(amount)} ${
-        tokenData?.symbol
-      }`,
+      description: `Approve ${tokenData?.symbol}`,
     });
     await txAlert(
-      `Successfully transfered ${amount} ${tokenData?.symbol}`,
+      `Successfully approved ${tokenData?.symbol}`,
       tx.wait(),
       chain?.blockExplorers?.default.url
     );
-    refetch?.();
+    refetch();
   };
 
-  const handleTransfer = (data: FormData) => {
-    transferTokens(data.address, ethers.utils.parseEther(data.amount));
+  const handleApprove = (data: FormData) => {
+    approveTokens(data.address, ethers.utils.parseEther(data.amount));
   };
 
   return (
     <Box>
       <Divider sx={{ mb: 2 }} />
-      <FormContainer formContext={formContext} onSuccess={handleTransfer}>
+      <FormContainer onSuccess={handleApprove}>
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6} md={5}>
             <TextFieldElement
-              label="Transfer to"
+              label="Approve to"
               name="address"
               required
               fullWidth
@@ -62,7 +60,12 @@ const TransferForm = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <MaxValueInput label="Amount" fullWidth />
+            <MaxValueInput
+              label="Amount"
+              minZero
+              fullWidth
+              maxValue={ethers.utils.formatEther(ethers.constants.MaxUint256)}
+            />
           </Grid>
           <Grid item xs={12} sm="auto">
             <Button
@@ -70,7 +73,7 @@ const TransferForm = () => {
               variant="contained"
               sx={{ height: "56px", width: "100px" }}
             >
-              Transfer
+              Approve
             </Button>
           </Grid>
         </Grid>
@@ -78,4 +81,5 @@ const TransferForm = () => {
     </Box>
   );
 };
-export default TransferForm;
+
+export default ApproveForm;

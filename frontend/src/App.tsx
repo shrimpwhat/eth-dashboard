@@ -1,10 +1,11 @@
 import { Routes, Route, Link } from "react-router-dom";
 import IndexPage from "./pages/IndexPage";
-import NftMintPage from "./pages/NftMintPage";
+import NftMintPage from "./pages/ERC721/NftMintPage";
 import { ToastContainer } from "react-toastify";
-import CollectionPage from "./pages/CollectionPage/";
-import TokenPage from "./pages/TokenPage";
-import TokenCreationPage from "./pages/TokenMintPage";
+import CollectionPage from "./pages/ERC721/CollectionPage";
+import TokenPage from "./pages/ERC20/TokenPage";
+import StakingForm from "./pages/ERC20/StakingForm";
+import TokenCreationPage from "./pages/ERC20/TokenMintPage";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import * as React from "react";
 
@@ -145,6 +146,7 @@ const App = () => {
             ["Home", "/", <HomeIcon color="primary" />],
             ["NFT", "/nft", <ImageIcon color="primary" />],
             ["ERC20", "/token", <TollIcon color="primary" />],
+            ["Staking", "/token/staking"],
           ].map((item, index) => (
             <ListItem key={index}>
               <ListItemButton component={Link} to={item[1] as string}>
@@ -188,6 +190,7 @@ const App = () => {
           <Route path="token">
             <Route path="" element={<TokenCreationPage />} />
             <Route path=":address" element={<TokenPage />} />
+            <Route path="staking" element={<StakingForm />} />
           </Route>
         </Routes>
       </Box>

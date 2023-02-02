@@ -1,4 +1,4 @@
-import FindContract from "../../utils/components/FindContract";
+import FindContract from "../../../utils/components/FindContract";
 import { useState } from "react";
 import MintSingleNft from "./SingleMint";
 import CreateCollection from "./CreateCollections";

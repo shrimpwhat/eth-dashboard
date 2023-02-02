@@ -1,18 +1,18 @@
-import CollectionFactoryInterface from "../../utils/abi/CollectionFactory";
+import CollectionFactoryInterface from "../../../utils/abi/CollectionFactory";
 import { useSigner, useContract, useAccount, useNetwork } from "wagmi";
 import {
   errorAlert,
   deployedCollectionAlert,
   ipfsAlert,
-} from "../../utils/components/Popups";
+} from "../../../utils/components/Popups";
 import { BigNumber, ethers } from "ethers";
 import NodeFormData from "form-data";
 import axios from "axios";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
-import FieldsWrapper from "../../utils/components/FieldsWrapper";
-import SubmitButton from "../../utils/components/SubmitButton";
+import FieldsWrapper from "../../../utils/components/FieldsWrapper";
+import SubmitButton from "../../../utils/components/SubmitButton";
 import Box from "@mui/material/Box";
 import { ChangeEvent, useState } from "react";
 import Typography from "@mui/material/Typography";

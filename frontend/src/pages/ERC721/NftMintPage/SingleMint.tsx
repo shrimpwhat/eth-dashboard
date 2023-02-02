@@ -1,8 +1,8 @@
-import NftMinterInterface from "../../utils/abi/NftMinter";
+import NftMinterInterface from "../../../utils/abi/NftMinter";
 import { useSigner, useContract } from "wagmi";
 import { ChangeEvent, useEffect, useState } from "react";
-import { nftMintAlert, ipfsAlert } from "../../utils/components/Popups";
-import FieldsWrapper from "../../utils/components/FieldsWrapper";
+import { nftMintAlert, ipfsAlert } from "../../../utils/components/Popups";
+import FieldsWrapper from "../../../utils/components/FieldsWrapper";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import NodeFormData from "form-data";
 import axios from "axios";
@@ -18,7 +18,7 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
-import SubmitButton from "../../utils/components/SubmitButton";
+import SubmitButton from "../../../utils/components/SubmitButton";
 
 interface FormProps {
   name: string;

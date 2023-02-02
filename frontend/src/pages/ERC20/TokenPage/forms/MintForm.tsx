@@ -1,6 +1,6 @@
 import { ethers, BigNumber } from "ethers";
 import { useAccount, useNetwork } from "wagmi";
-import { txAlert } from "../../../utils/components/Popups";
+import { txAlert } from "../../../../utils/components/Popups";
 import { useContext } from "react";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { TokenContext } from "..";
