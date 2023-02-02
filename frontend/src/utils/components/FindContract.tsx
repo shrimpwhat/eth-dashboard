@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Divider from "@mui/material/Divider";
@@ -7,24 +6,15 @@ import Container from "@mui/material/Container";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme, styled } from "@mui/material/styles";
 
-type FormProps = {
-  address: string;
-};
-
 export default function FindContract({
-  url,
   text,
+  onSuccess,
 }: {
-  url: string;
   text: string;
+  onSuccess: ({ address }: { address: string }) => void;
 }) {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
-  const navigate = useNavigate();
-
-  const handleSubmit = ({ address }: FormProps) => {
-    navigate(url + address);
-  };
 
   const Wrapper = styled(Container)(() => ({
     display: "flex",
@@ -34,7 +24,7 @@ export default function FindContract({
   }));
 
   return (
-    <FormContainer onSuccess={handleSubmit}>
+    <FormContainer onSuccess={onSuccess}>
       <Wrapper maxWidth="md">
         <TextFieldElement
           label={text}

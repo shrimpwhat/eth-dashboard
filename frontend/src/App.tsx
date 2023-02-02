@@ -178,6 +178,7 @@ const App = () => {
             }),
             marginLeft: 0,
           }),
+          pt: 5,
         }}
       >
         <DrawerHeader />

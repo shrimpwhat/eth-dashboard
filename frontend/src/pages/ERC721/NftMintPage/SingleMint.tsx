@@ -156,12 +156,12 @@ const MintSingleNft = () => {
           <SubmitButton text="Mint" />
         </FieldsWrapper>
       </FormContainer>
-      <NftPreview name={name} description={description} image={imageSrc} />
+      <NFTPreview name={name} description={description} image={imageSrc} />
     </Box>
   );
 };
 
-const NftPreview = ({
+const NFTPreview = ({
   name,
   description,
   image,
@@ -181,7 +181,7 @@ const NftPreview = ({
       <Divider />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {name ? name : "Nft name"}
+          {name ? name : "NFT name"}
         </Typography>
         <Typography
           variant="body2"
@@ -190,7 +190,7 @@ const NftPreview = ({
         >
           {description
             ? description
-            : "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo possimus eos eius commodi illo nemo repudiandae facere aliquam quos explicabo? Cum aliquam molestias at sit nesciunt, accusamus voluptatem suscipit odio."}
+            : "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo possimus eos eius commodi"}
         </Typography>
       </CardContent>
     </Card>

@@ -2,6 +2,7 @@ import FindContract from "../../../utils/components/FindContract";
 import { useState } from "react";
 import MintSingleNft from "./SingleMint";
 import CreateCollection from "./CreateCollections";
+import { useNavigate } from "react-router-dom";
 
 import Typography from "@mui/material/Typography";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -11,12 +12,17 @@ import Box from "@mui/material/Box";
 
 export default function NftMintPage() {
   const [activeButton, setActiveButton] = useState(1);
+  const navigate = useNavigate();
+
   return (
     <Box>
+      <FindContract
+        text={"Collection address"}
+        onSuccess={(address) => navigate(`/nft/${address}`)}
+      />
       <Typography variant="h5" mb={4}>
         Mint NFT
       </Typography>
-      <FindContract url="/nft/" text={"Collection address"} />
       <Container
         maxWidth="xs"
         sx={{ display: "flex", justifyContent: "center", mb: 6 }}

@@ -25,15 +25,8 @@ import OwnerActions from "./OwnerActions";
 import RecentStake from "./RecentStake";
 import StakingStats from "./Stats";
 import Link from "@mui/material/Link";
-import { red } from "@mui/material/colors";
-import {
-  FormContainer,
-  TextFieldElement,
-  useForm,
-  useWatch,
-} from "react-hook-form-mui";
-import FieldsWrapper from "../../../utils/components/FieldsWrapper";
-import Container from "@mui/material/Container";
+import { useState } from "react";
+import FindContract from "../../../utils/components/FindContract";
 
 interface StakingData {
   address?: string;
@@ -62,37 +55,15 @@ export { StakingDataContext };
 const STAKING_FACTORY_ADDRESS = process.env.REACT_APP_ERC20_STAKING_FACTORY;
 
 const Page = () => {
-  const formContext = useForm();
-  const address = useWatch({ name: "address", control: formContext.control });
+  const [address, setAddress] = useState("");
 
   return (
     <>
-      <FormContainer formContext={formContext}>
-        <Container
-          maxWidth="lg"
-          sx={{
-            display: "flex",
-            gap: 4,
-            flexWrap: "wrap",
-            justifyContent: "center",
-            flexDirection: "row",
-          }}
-        >
-          <TextFieldElement
-            name="address"
-            label="Token contract address"
-            helperText="Paste a ERC20 token contract which has already deployed stakingContract"
-            fullWidth
-            validation={{
-              validate: (s) =>
-                ethers.utils.isAddress(s) ? true : "Not an ethereum address!",
-            }}
-          />
-          <Button variant="contained">Find</Button>
-        </Container>
-      </FormContainer>
-      <Divider sx={{ my: 4 }} />
-      {formContext.formState.isValid && <StakingForm tokenAddress={address} />}
+      <FindContract
+        text="ERC20 contract address"
+        onSuccess={({ address }) => setAddress(address)}
+      />
+      <StakingForm tokenAddress={address} />
     </>
   );
 };
@@ -233,19 +204,19 @@ const StakingForm = ({ tokenAddress }: { tokenAddress: string }) => {
   };
 
   if (stakingAddress === ethers.constants.AddressZero) {
-    if (address !== tokenData?.owner) return null;
-    else
-      return (
-        <Box>
-          <Divider sx={{ mb: 2 }} />
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            Staking contract hasn't been setup yet
-          </Typography>
+    return (
+      <Box>
+        <Divider sx={{ mb: 2 }} />
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Staking contract hasn't been setup yet
+        </Typography>
+        {address === tokenData?.owner && (
           <Button variant="outlined" onClick={setupStakingContract}>
             Setup
           </Button>
-        </Box>
-      );
+        )}
+      </Box>
+    );
   } else {
     if (!isFetchedAfterMount) return null;
     else

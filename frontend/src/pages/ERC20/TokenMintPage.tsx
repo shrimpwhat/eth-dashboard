@@ -9,12 +9,14 @@ import { Typography } from "@mui/material";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import FieldsWrapper from "../../utils/components/FieldsWrapper";
 import SubmitButton from "../../utils/components/SubmitButton";
+import { useNavigate } from "react-router-dom";
 
 const ERC20_FACTORY_ADDRESS = process.env.REACT_APP_ERC20_FACTORY as string;
 
 export default function TokenCreationPage() {
   const { data: signer } = useSigner();
   const addRecentTransaction = useAddRecentTransaction();
+  const navigate = useNavigate();
 
   const contract = useContract({
     address: ERC20_FACTORY_ADDRESS,
@@ -47,30 +49,31 @@ export default function TokenCreationPage() {
 
   return (
     <Box>
+      <FindContract
+        text={"Token address"}
+        onSuccess={(address) => navigate(`/token/${address}`)}
+      />
       <Typography variant="h5" mb={4}>
-        Create Token
+        Deploy new ERC20 token
       </Typography>
-      <Box>
-        <FindContract url="/token/" text={"Token address"} />
-        <FormContainer onSuccess={createToken}>
-          <FieldsWrapper>
-            <TextFieldElement label="Name" name="name" required fullWidth />
-            <TextFieldElement label="Symbol" name="symbol" required fullWidth />
-            <TextFieldElement
-              label="Initial supply"
-              name="supply"
-              type="number"
-              inputProps={{ min: 0 }}
-              validation={{
-                min: { value: 0, message: "Must be greater or equal 0" },
-              }}
-              required
-              fullWidth
-            />
-            <SubmitButton text="Create" />
-          </FieldsWrapper>
-        </FormContainer>
-      </Box>
+      <FormContainer onSuccess={createToken}>
+        <FieldsWrapper>
+          <TextFieldElement label="Name" name="name" required fullWidth />
+          <TextFieldElement label="Symbol" name="symbol" required fullWidth />
+          <TextFieldElement
+            label="Initial supply"
+            name="supply"
+            type="number"
+            inputProps={{ min: 0 }}
+            validation={{
+              min: { value: 0, message: "Must be greater or equal 0" },
+            }}
+            required
+            fullWidth
+          />
+          <SubmitButton text="Create" />
+        </FieldsWrapper>
+      </FormContainer>
     </Box>
   );
 }
