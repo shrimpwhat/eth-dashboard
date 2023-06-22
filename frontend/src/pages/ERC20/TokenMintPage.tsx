@@ -51,7 +51,7 @@ export default function TokenCreationPage() {
     <Box>
       <FindContract
         text={"Token address"}
-        onSuccess={(address) => navigate(`/token/${address}`)}
+        onSuccess={({ address }) => navigate(`/token/${address}`)}
       />
       <Typography variant="h5" mb={4}>
         Deploy new ERC20 token

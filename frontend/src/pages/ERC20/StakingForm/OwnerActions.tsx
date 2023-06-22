@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { useContext } from "react";
-import { TokenContext } from "../TokenPage";
 import { txAlert } from "../../../utils/components/Popups";
 import MaxBalanceInput from "../../../utils/components/MaxValueInput";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -14,9 +13,14 @@ import { StakingDataContext } from ".";
 import { useNetwork } from "wagmi";
 
 const OwnerActions = ({ address }: { address?: string }) => {
-  const { tokenData } = useContext(TokenContext);
-  const { stakingData, allowance, approve, stakingContract, refetchStaking } =
-    useContext(StakingDataContext);
+  const {
+    stakingData,
+    allowance,
+    approve,
+    stakingContract,
+    refetchStaking,
+    tokenData,
+  } = useContext(StakingDataContext);
   const addRecentTransaction = useAddRecentTransaction();
   const { chain } = useNetwork();
 
@@ -58,76 +62,82 @@ const OwnerActions = ({ address }: { address?: string }) => {
   else
     return (
       <Box>
-        <Divider sx={{ mb: 2 }} />
-        <FormContainer onSuccess={startPeriod}>
-          <Typography variant="body2" mb={2}>
-            Start new reward period
-          </Typography>
-          <Container
-            maxWidth="sm"
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              flexWrap: "wrap",
-              gap: 2,
-            }}
-          >
-            <MaxBalanceInput
-              label="Total rewards"
-              fullWidth
-              sx={{ maxWidth: "300px" }}
-            />
-            {allowance?.eq(0) ? (
-              <Button
-                variant="contained"
-                sx={{ height: "56px" }}
-                onClick={approve}
-              >
-                Approve
-              </Button>
-            ) : (
-              <Button type="submit" variant="contained" sx={{ height: "56px" }}>
-                Start
-              </Button>
-            )}
-          </Container>
-        </FormContainer>
-        <FormContainer onSuccess={updateDuration}>
-          <Typography variant="body2" my={2}>
-            Current duration of each reward period is:{" "}
-            <Typography
-              component="span"
-              sx={{ whiteSpace: "nowrap", fontWeight: "bold" }}
-            >
-              {stakingData?.duration?.div(86400)?.toString()} days{" "}
-            </Typography>
-          </Typography>
-          <Container
-            maxWidth="sm"
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              flexWrap: "wrap",
-              gap: 2,
-            }}
-          >
-            <TextFieldElement
-              name="duration"
-              label="New duration(in seconds)"
-              type="number"
-              required
-              inputProps={{ min: 1 }}
-              validation={{
-                min: { value: 1, message: "Must be greater than 0" },
+        <Divider sx={{ mb: 4, mt: -1 }} />
+        <Box display="flex" gap={3} justifyContent="center" flexWrap="wrap">
+          <FormContainer onSuccess={startPeriod}>
+            <Container
+              maxWidth="sm"
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: 2,
               }}
-              fullWidth
-              sx={{ maxWidth: "300px" }}
-            />
-            <Button type="submit" variant="contained" sx={{ height: "56px" }}>
-              Update
-            </Button>
-          </Container>
-        </FormContainer>
+            >
+              <Typography variant="body2" textAlign="center">
+                Start new reward period
+              </Typography>
+              <MaxBalanceInput
+                label="Total rewards"
+                fullWidth
+                sx={{ maxWidth: "300px" }}
+              />
+              {allowance?.eq(0) ? (
+                <Button
+                  variant="contained"
+                  sx={{ height: "56px" }}
+                  onClick={approve}
+                >
+                  Approve
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ height: "56px" }}
+                >
+                  Start
+                </Button>
+              )}
+            </Container>
+          </FormContainer>
+          <FormContainer onSuccess={updateDuration}>
+            <Container
+              maxWidth="sm"
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: 2,
+              }}
+            >
+              <Typography variant="body2" textAlign="center">
+                Current duration of each reward period is:{" "}
+                <Typography
+                  component="span"
+                  sx={{ whiteSpace: "nowrap", fontWeight: "bold" }}
+                >
+                  {stakingData?.duration?.div(86400)?.toString()} days{" "}
+                </Typography>
+              </Typography>
+              <TextFieldElement
+                name="duration"
+                label="New duration(in seconds)"
+                type="number"
+                required
+                inputProps={{ min: 1 }}
+                validation={{
+                  min: { value: 1, message: "Must be greater than 0" },
+                }}
+                fullWidth
+                sx={{ maxWidth: "300px" }}
+              />
+              <Button type="submit" variant="contained" sx={{ height: "56px" }}>
+                Update
+              </Button>
+            </Container>
+          </FormContainer>
+        </Box>
       </Box>
     );
 };

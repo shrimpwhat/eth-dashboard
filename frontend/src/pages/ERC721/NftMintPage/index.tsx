@@ -18,7 +18,7 @@ export default function NftMintPage() {
     <Box>
       <FindContract
         text={"Collection address"}
-        onSuccess={(address) => navigate(`/nft/${address}`)}
+        onSuccess={({ address }) => navigate(`/nft/${address}`)}
       />
       <Typography variant="h5" mb={4}>
         Mint NFT

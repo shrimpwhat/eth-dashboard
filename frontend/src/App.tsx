@@ -142,21 +142,61 @@ const App = () => {
             if (!matches) setOpen(false);
           }}
         >
+          <ListItem>
+            <ListItemButton component={Link} to="/">
+              <ListItemIcon>
+                <HomeIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Home"
+                primaryTypographyProps={{ sx: { fontWeight: 700 } }}
+              />
+            </ListItemButton>
+          </ListItem>
           {[
-            ["Home", "/", <HomeIcon color="primary" />],
-            ["NFT", "/nft", <ImageIcon color="primary" />],
-            ["ERC20", "/token", <TollIcon color="primary" />],
-            ["Staking", "/token/staking"],
+            {
+              name: "NFT",
+              icon: <ImageIcon color="primary" />,
+              children: [
+                { name: "Mint", url: "/nft/" },
+                { name: "Staking", url: "/" },
+              ],
+            },
+            {
+              name: "ERC20",
+              icon: <TollIcon color="primary" />,
+              children: [
+                { name: "Mint", url: "/token/" },
+                { name: "Staking", url: "/token/staking" },
+              ],
+            },
           ].map((item, index) => (
-            <ListItem key={index}>
-              <ListItemButton component={Link} to={item[1] as string}>
-                <ListItemIcon>{item[2]}</ListItemIcon>
+            <>
+              <Divider sx={{ mt: 4 }} />
+              <ListItem key={index} sx={{ px: 4, py: 2 }}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText
-                  primary={item[0]}
+                  primary={item.name}
                   primaryTypographyProps={{ sx: { fontWeight: 700 } }}
                 />
-              </ListItemButton>
-            </ListItem>
+              </ListItem>
+              <Box bgcolor="white" borderRadius={3} mx={5}>
+                {item.children.map((child, index) => (
+                  <ListItem>
+                    <ListItemButton component={Link} to={child.url} key={index}>
+                      {/* <ListItemIcon></ListItemIcon> */}
+                      <ListItemText
+                        primary={child.name}
+                        primaryTypographyProps={{
+                          sx: { ml: 2 },
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </Box>
+              <Divider />
+            </>
           ))}
         </List>
       </Drawer>

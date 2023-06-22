@@ -1,15 +1,13 @@
 import { ethers } from "ethers";
 import { useContext } from "react";
 import floatValue from "../../../utils/components/FloatValue";
-import { TokenContext } from "../TokenPage";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { StakingDataContext } from ".";
 
 const StakingStats = () => {
   const SECS_PER_YEAR = 365 * 86400;
-  const { tokenData } = useContext(TokenContext);
-  const { stakingData } = useContext(StakingDataContext);
+  const { stakingData, tokenData } = useContext(StakingDataContext);
 
   const getApr = () => {
     const rate = parseFloat(stakingData?.rewardRate?.toString() ?? "0");
@@ -31,6 +29,7 @@ const StakingStats = () => {
       mx="auto"
       flexWrap="wrap"
       justifyContent="center"
+      textAlign="center"
     >
       <Box
         border="1px solid black"

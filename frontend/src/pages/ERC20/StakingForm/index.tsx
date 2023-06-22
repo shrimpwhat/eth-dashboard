@@ -16,7 +16,6 @@ import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
@@ -27,20 +26,30 @@ import StakingStats from "./Stats";
 import Link from "@mui/material/Link";
 import { useState } from "react";
 import FindContract from "../../../utils/components/FindContract";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface StakingData {
   address?: string;
-  duration?: ethers.BigNumber;
-  totalSupply?: ethers.BigNumber;
-  periodFinish?: ethers.BigNumber;
-  rewardRate?: ethers.BigNumber;
-  earned?: ethers.BigNumber;
-  amount?: ethers.BigNumber;
-  rewards?: ethers.BigNumber;
+  duration?: BigNumber;
+  totalSupply?: BigNumber;
+  periodFinish?: BigNumber;
+  rewardRate?: BigNumber;
+  earned?: BigNumber;
+  amount?: BigNumber;
+  rewards?: BigNumber;
+}
+
+interface TokenData {
+  name?: string;
+  symbol?: string;
+  owner?: string;
+  decimals?: number;
+  balance?: BigNumber;
 }
 
 interface StakingContext {
   stakingData?: StakingData;
+  tokenData?: TokenData;
   stakingContract: ethers.Contract | null;
   refetchStaking?: () => Promise<any>;
   allowance?: ethers.BigNumber;
@@ -63,7 +72,7 @@ const Page = () => {
         text="ERC20 contract address"
         onSuccess={({ address }) => setAddress(address)}
       />
-      <StakingForm tokenAddress={address} />
+      {address && <StakingForm tokenAddress={address} />}
     </>
   );
 };
@@ -78,18 +87,28 @@ const StakingForm = ({ tokenAddress }: { tokenAddress: string }) => {
     address: tokenAddress,
     abi: ERC20ABI,
   };
-  const { data: tokenData } = useContractReads({
-    contracts: [
-      { ...tokenContractData, functionName: "name" },
-      { ...tokenContractData, functionName: "symbol" },
-      { ...tokenContractData, functionName: "owner" },
-    ],
-    select: (data) => ({
-      name: data?.at(0),
-      symbol: data?.at(1),
-      owner: data?.at(2),
-    }),
-  });
+  const { data: tokenData, isFetchedAfterMount: isTokenDataFetched } =
+    useContractReads({
+      contracts: [
+        { ...tokenContractData, functionName: "name" },
+        { ...tokenContractData, functionName: "symbol" },
+        { ...tokenContractData, functionName: "owner" },
+        { ...tokenContractData, functionName: "decimals" },
+        {
+          ...tokenContractData,
+          functionName: "balanceOf",
+          args: [address ?? ethers.constants.AddressZero],
+        },
+      ],
+      select: (data) => ({
+        name: data[0],
+        symbol: data[1],
+        owner: data[2],
+        decimals: data[3],
+        balance: data[4],
+      }),
+      watch: true,
+    });
   const token = useContract({
     ...tokenContractData,
     signerOrProvider: signer,
@@ -203,18 +222,34 @@ const StakingForm = ({ tokenAddress }: { tokenAddress: string }) => {
     }
   };
 
-  if (stakingAddress === ethers.constants.AddressZero) {
+  if (!isTokenDataFetched || !isFetchedAfterMount)
     return (
       <Box>
-        <Divider sx={{ mb: 2 }} />
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Staking contract hasn't been setup yet
+        <Typography variant="h5" gutterBottom>
+          Staking
         </Typography>
-        {address === tokenData?.owner && (
-          <Button variant="outlined" onClick={setupStakingContract}>
-            Setup
-          </Button>
-        )}
+        <Typography variant="h5" mt={5}>
+          Fetching data
+          <CircularProgress size="30px" sx={{ ml: 2 }} />
+        </Typography>
+      </Box>
+    );
+  else if (stakingAddress === ethers.constants.AddressZero) {
+    return (
+      <Box>
+        <Typography variant="h5" mb={3}>
+          Staking
+        </Typography>
+        <Box textAlign="center">
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Staking contract hasn't been setup yet
+          </Typography>
+          {address === tokenData?.owner && (
+            <Button variant="outlined" onClick={setupStakingContract}>
+              Setup
+            </Button>
+          )}
+        </Box>
       </Box>
     );
   } else {
@@ -228,39 +263,46 @@ const StakingForm = ({ tokenAddress }: { tokenAddress: string }) => {
             refetchStaking,
             allowance,
             approve,
+            tokenData,
           }}
         >
-          <Stack gap={2}>
-            <Divider />
-            <Typography variant="h5">Staking</Typography>
+          <Typography variant="h5">Staking</Typography>
+          <Box
+            display="flex"
+            gap={2}
+            my={3}
+            justifyContent="center"
+            flexWrap="wrap"
+          >
+            <Button
+              size="small"
+              sx={{ width: "190px" }}
+              variant="outlined"
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  stakingAddress ?? ethers.constants.AddressZero
+                )
+              }
+            >
+              Contract Address
+              <ContentCopyIcon sx={{ fontSize: 15 }} />
+            </Button>
+            <Button variant="outlined" size="small" sx={{ width: "190px" }}>
+              <Link
+                target="_blank"
+                rel="noreferrer"
+                underline="none"
+                href={`${chain?.blockExplorers?.default.url}/address/${stakingAddress}`}
+              >
+                Explorer <ArrowOutwardIcon sx={{ fontSize: 15 }} />
+              </Link>
+            </Button>
+          </Box>
+          <Stack gap={7}>
             <StakingStats />
             <RecentStake />
             <DepositWithdraw />
             <OwnerActions address={address} />
-            <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    stakingAddress ?? ethers.constants.AddressZero
-                  )
-                }
-              >
-                Contract Address
-                <ContentCopyIcon sx={{ fontSize: 15 }} />
-              </Button>
-              <Button variant="outlined" size="small">
-                <Link
-                  target="_blank"
-                  rel="noreferrer"
-                  underline="none"
-                  href={`${chain?.blockExplorers?.default}/address/${stakingAddress}`}
-                >
-                  Explorer <ArrowOutwardIcon sx={{ fontSize: 15 }} />
-                </Link>
-              </Button>
-            </Box>
           </Stack>
         </StakingDataContext.Provider>
       );

@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { useContext, useState } from "react";
-import { TokenContext } from "../TokenPage";
 import { txAlert } from "../../../utils/components/Popups";
 import MaxBalanceInput from "../../../utils/components/MaxValueInput";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -11,6 +10,7 @@ import { FormContainer } from "react-hook-form-mui";
 import Container from "@mui/material/Container";
 import { StakingDataContext } from ".";
 import { useNetwork } from "wagmi";
+import Box from "@mui/material/Box";
 
 const DepositWithdraw = () => {
   const [type, setType] = useState<"deposit" | "withdraw">("deposit");
@@ -23,9 +23,14 @@ const DepositWithdraw = () => {
   const { chain } = useNetwork();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const { tokenData, refetch: refetchBalance } = useContext(TokenContext);
-  const { stakingData, refetchStaking, allowance, approve, stakingContract } =
-    useContext(StakingDataContext);
+  const {
+    stakingData,
+    refetchStaking,
+    allowance,
+    approve,
+    stakingContract,
+    tokenData,
+  } = useContext(StakingDataContext);
 
   const deposit = async ({ amount }: { amount: string }) => {
     const tx = await stakingContract?.stake(
@@ -42,7 +47,6 @@ const DepositWithdraw = () => {
         chain?.blockExplorers?.default.url
       );
       refetchStaking?.();
-      refetchBalance?.();
     }
   };
 
@@ -61,26 +65,27 @@ const DepositWithdraw = () => {
         chain?.blockExplorers?.default.url
       );
       refetchStaking?.();
-      refetchBalance?.();
     }
   };
 
   return (
-    <>
-      <ToggleButtonGroup
-        value={type}
-        exclusive
-        onChange={handleType}
-        color="primary"
-        sx={{ mx: "auto", mt: 2 }}
-      >
-        <ToggleButton value="deposit" sx={{ width: "105px" }}>
-          Deposit
-        </ToggleButton>
-        <ToggleButton value="withdraw" sx={{ width: "105px" }}>
-          Withdraw
-        </ToggleButton>
-      </ToggleButtonGroup>
+    <Box>
+      <Box display="flex">
+        <ToggleButtonGroup
+          value={type}
+          exclusive
+          onChange={handleType}
+          color="primary"
+          sx={{ mx: "auto", mb: 2 }}
+        >
+          <ToggleButton value="deposit" sx={{ width: "105px" }}>
+            Deposit
+          </ToggleButton>
+          <ToggleButton value="withdraw" sx={{ width: "105px" }}>
+            Withdraw
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
       <FormContainer onSuccess={type === "deposit" ? deposit : withdraw}>
         <Container
           sx={{
@@ -120,7 +125,7 @@ const DepositWithdraw = () => {
           )}
         </Container>
       </FormContainer>
-    </>
+    </Box>
   );
 };
 

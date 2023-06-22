@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { useContext } from "react";
-import { TokenContext } from "../TokenPage";
 import { txAlert } from "../../../utils/components/Popups";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import Box from "@mui/material/Box";
@@ -11,8 +10,7 @@ import floatValue from "../../../utils/components/FloatValue";
 import { useNetwork } from "wagmi";
 
 const RecentStake = () => {
-  const { tokenData, refetch: refetchBalance } = useContext(TokenContext);
-  const { stakingData, refetchStaking, stakingContract } =
+  const { stakingData, refetchStaking, stakingContract, tokenData } =
     useContext(StakingDataContext);
   const addRecentTransaction = useAddRecentTransaction();
   const { chain } = useNetwork();
@@ -30,7 +28,6 @@ const RecentStake = () => {
         chain?.blockExplorers?.default?.url
       );
       refetchStaking?.();
-      refetchBalance?.();
     }
   };
 
@@ -51,12 +48,13 @@ const RecentStake = () => {
   };
 
   return (
-    <>
+    <Box>
       <Box
         gap={2}
         display="flex"
         justifyContent="center"
         mt={2}
+        mb={1}
         flexWrap="wrap"
       >
         <TextField
@@ -100,7 +98,7 @@ const RecentStake = () => {
           Compound
         </Button>
       </Box>
-    </>
+    </Box>
   );
 };
 
