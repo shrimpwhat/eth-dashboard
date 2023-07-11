@@ -2,24 +2,57 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Container,
+  Divider,
+} from "@mui/material";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 
 const Index = () => {
   const { isConnected } = useAccount();
   return (
     <Box>
-      <Typography variant="h5" textAlign={{ xs: "center", md: "left" }}>
-        Welcome to the Web3 Developer Dashboard! Here you can:
+      <Typography variant="h5" textAlign="center" sx={{ letterSpacing: 1 }}>
+        Welcome to the Web3 Developer Dashboard!
       </Typography>
-      <List disablePadding>
+      <Container maxWidth="lg" sx={{ display: "flex", mt: 5 }}>
+        <Card
+          sx={{
+            border: "3px solid",
+            borderColor: "primary.main",
+            borderRadius: "20px",
+          }}
+        >
+          <CardMedia sx={{ textAlign: "center" }}>
+            <ImageOutlinedIcon
+              sx={{
+                fontSize: "300px",
+                color: "grey.400",
+              }}
+            />
+          </CardMedia>
+          <CardContent sx={{ pt: 0 }}>
+            <Typography variant="h5" sx={{ mb: 2, color: "primary.main" }}>
+              NFT
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              Mint your own NFT or a whole collection
+            </Typography>
+          </CardContent>
+        </Card>
+        {/* <Card>
+          <CardMedia></CardMedia>
+          <CardContent></CardContent>
+        </Card> */}
+      </Container>
+      {/* <List disablePadding>
         {[
-          "Mint your own NFT or a whole collection",
-          "Setup a staking contract for your collection with rewards in any token",
+          "",
           "Create your own ERC-20 token",
           "Create a farming contract for your token",
-          "Provide a liquidity to your tokens and make them available for swaps",
         ].map((item, index) => (
           <ListItem key={index}>
             <ListItemText
@@ -28,7 +61,7 @@ const Index = () => {
             />
           </ListItem>
         ))}
-      </List>
+      </List> */}
       <Box
         sx={{
           display: "flex",
@@ -38,9 +71,6 @@ const Index = () => {
           gap: 3,
         }}
       >
-        <Typography variant="h5" fontWeight={600} textAlign="center">
-          Connect wallet and start creating!
-        </Typography>
         {!isConnected && <ConnectButton />}
       </Box>
     </Box>

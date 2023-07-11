@@ -11,6 +11,12 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { BrowserRouter } from "react-router-dom";
 
+declare module "@mui/material/styles" {
+  interface SimplePaletteColorOptions {
+    gradient?: string;
+  }
+}
+
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const { chains, provider } = configureChains(
@@ -40,6 +46,7 @@ const theme = createTheme({
   palette: {
     primary: {
       main: deepPurple.A700,
+      gradient: "linear-gradient(0.25turn, #6200ea, #9c27b0)",
     },
   },
   typography: {
