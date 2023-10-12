@@ -1,78 +1,85 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Container,
-  Divider,
-} from "@mui/material";
+import { Card, CardContent, CardMedia, Container, Link } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
+import { deepPurple } from "@mui/material/colors";
 
 const Index = () => {
-  const { isConnected } = useAccount();
+  const links = [
+    {
+      route: "/nft",
+      title: "NFT",
+      description: "Mint your own NFT or a whole collection",
+      icon: (
+        <ImageOutlinedIcon
+          sx={{
+            fontSize: "200px",
+            color: deepPurple[200],
+          }}
+        />
+      ),
+    },
+    {
+      route: "/token",
+      title: "Fungible tokens",
+      description: "Create new ERC20 token",
+      icon: (
+        <MonetizationOnOutlinedIcon
+          sx={{ fontSize: "200px", color: deepPurple[200] }}
+        />
+      ),
+    },
+  ];
+
   return (
     <Box>
-      <Typography variant="h5" textAlign="center" sx={{ letterSpacing: 1 }}>
-        Welcome to the Web3 Developer Dashboard!
-      </Typography>
-      <Container maxWidth="lg" sx={{ display: "flex", mt: 5 }}>
-        <Card
-          sx={{
-            border: "3px solid",
-            borderColor: "primary.main",
-            borderRadius: "20px",
-          }}
-        >
-          <CardMedia sx={{ textAlign: "center" }}>
-            <ImageOutlinedIcon
-              sx={{
-                fontSize: "300px",
-                color: "grey.400",
-              }}
-            />
-          </CardMedia>
-          <CardContent sx={{ pt: 0 }}>
-            <Typography variant="h5" sx={{ mb: 2, color: "primary.main" }}>
-              NFT
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              Mint your own NFT or a whole collection
-            </Typography>
-          </CardContent>
-        </Card>
-        {/* <Card>
-          <CardMedia></CardMedia>
-          <CardContent></CardContent>
-        </Card> */}
-      </Container>
-      {/* <List disablePadding>
-        {[
-          "",
-          "Create your own ERC-20 token",
-          "Create a farming contract for your token",
-        ].map((item, index) => (
-          <ListItem key={index}>
-            <ListItemText
-              primary={"- " + item}
-              primaryTypographyProps={{ variant: "body2" }}
-            />
-          </ListItem>
-        ))}
-      </List> */}
-      <Box
+      <Container
+        maxWidth="lg"
         sx={{
           display: "flex",
+          mt: 5,
           flexWrap: "wrap",
+          gap: 5,
           justifyContent: "center",
-          maxWidth: "max-content",
-          gap: 3,
         }}
       >
-        {!isConnected && <ConnectButton />}
-      </Box>
+        {links.map((item, index) => (
+          <Link
+            component={RouterLink}
+            to={item.route}
+            underline="none"
+            key={index}
+          >
+            <Card
+              sx={{
+                border: "2px solid",
+                borderColor: "primary.main",
+                borderRadius: "10px",
+                p: 1,
+                width: { xs: "300px", md: "400px" },
+                minHeight: "365px",
+              }}
+              className="IndexPage_navigation_card"
+            >
+              <CardMedia sx={{ textAlign: "center" }}>{item.icon}</CardMedia>
+              <CardContent sx={{ pt: 0 }}>
+                <Typography variant="h5" sx={{ mb: 2, color: "primary.main" }}>
+                  {item.title}
+                </Typography>
+                <Typography
+                  fontWeight={500}
+                  textAlign={"center"}
+                  fontSize="1.3rem"
+                >
+                  {item.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </Container>
     </Box>
   );
 };

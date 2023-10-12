@@ -9,6 +9,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import { ListItemButton } from "@mui/material";
 
+// eslint-disable-next-line react-refresh/only-export-components
 const Address = ({ data }: { data: string }) => {
   return (
     <Typography
@@ -68,7 +69,7 @@ const basePromisePopup = (
 };
 
 export const deployedCollectionAlert = (fn: Promise<string>) => {
-  basePromisePopup(fn, (data: string) => (
+  return basePromisePopup(fn, (data: string) => (
     <Box>
       <Typography>
         Collection deployed at address:

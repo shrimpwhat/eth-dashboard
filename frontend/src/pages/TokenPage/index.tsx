@@ -40,7 +40,7 @@ interface TokenProps {
 interface TokenContextInterface {
   token: ethers.Contract | null;
   tokenData?: TokenProps;
-  refetch: Function;
+  refetch: () => any;
 }
 
 const TokenContext = createContext<TokenContextInterface>({

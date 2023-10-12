@@ -54,7 +54,7 @@ const StakingForm = () => {
   const { data: signer } = useSigner();
 
   const factoryData = {
-    address: process.env.REACT_APP_ERC20_STAKING_FACTORY as string,
+    address: import.meta.env.VITE_ERC20_STAKING_FACTORY as string,
     abi: stakignFactoryABI,
   };
   const factoryContract = useContract({

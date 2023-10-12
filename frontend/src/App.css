@@ -1,0 +1,14 @@
+.IndexPage_navigation_card {
+  box-shadow: 0 0 20px #6200ea52 !important;
+}
+
+@media (min-width: 900px) {
+  .IndexPage_navigation_card {
+    transition: 0.3s !important;
+  }
+
+  .IndexPage_navigation_card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px #6200ea70 !important;
+  }
+}

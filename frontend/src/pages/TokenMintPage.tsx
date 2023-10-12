@@ -15,7 +15,7 @@ export default function TokenCreationPage() {
   const addRecentTransaction = useAddRecentTransaction();
 
   const contract = useContract({
-    address: process.env.REACT_APP_TOKEN_FACTORY as string,
+    address: import.meta.env.VITE_TOKEN_FACTORY as string,
     abi: TokenFactoryAbi,
     signerOrProvider: signer,
   });

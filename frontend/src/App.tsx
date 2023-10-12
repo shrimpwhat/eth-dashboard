@@ -27,6 +27,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import TollIcon from "@mui/icons-material/Toll";
 import ImageIcon from "@mui/icons-material/Image";
+import "./App.css";
 
 const App = () => {
   const theme = useTheme();
@@ -75,7 +76,7 @@ const App = () => {
       <AppBar open={open}>
         <Toolbar
           sx={{
-            background: theme.palette.primary.gradient,
+            background: "linear-gradient(0.25turn, #6200ea, #9c27b0)",
           }}
         >
           <IconButton

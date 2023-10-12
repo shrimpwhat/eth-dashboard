@@ -19,8 +19,8 @@ import Typography from "@mui/material/Typography";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 
-const contractAddress = process.env.REACT_APP_NFT_FACTORY_ADDRESS as string;
-const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
+const contractAddress = import.meta.env.VITE_NFT_FACTORY_ADDRESS as string;
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT_KEY;
 
 interface FormData {
   name: string;
@@ -55,7 +55,7 @@ const CreateCollection = () => {
 
   const [active, setActive] = useState<"url" | "upload">("url");
   const handleActive = (
-    event: React.MouseEvent<HTMLElement>,
+    _: React.MouseEvent<HTMLElement>,
     newActive: "url" | "upload" | null
   ) => {
     if (newActive !== null) setActive(newActive);
