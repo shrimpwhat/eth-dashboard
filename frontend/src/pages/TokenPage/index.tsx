@@ -114,7 +114,9 @@ export default function TokenPage() {
                     fontStyle="italic"
                   >
                     {`${floatValue(
-                      ethers.utils.formatEther(readData?.at(0) ?? 0),
+                      ethers.utils.formatEther(
+                        (readData?.at(0) as BigNumber) ?? 0
+                      ),
                       5
                     )} ${tokenInfo.data?.symbol}`}
                   </Box>
@@ -123,7 +125,7 @@ export default function TokenPage() {
                   value={{
                     token,
                     tokenData: {
-                      balance: readData?.at(0) ?? 0,
+                      balance: (readData?.at(0) as BigNumber) ?? 0,
                       owner: readData?.at(1) as string,
                       ...tokenInfo?.data,
                     },

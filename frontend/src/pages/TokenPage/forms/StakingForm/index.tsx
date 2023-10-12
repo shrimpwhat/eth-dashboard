@@ -102,15 +102,15 @@ const StakingForm = () => {
         functionName: "rewardPool",
       },
     ],
-    select: (data) => ({
+    select: (data): StakingData => ({
       address: stakingAddress,
-      duration: data[0],
-      totalSupply: data[1],
-      periodFinish: data[2],
-      rewardRate: data[3],
-      earned: data[4],
-      amount: data[5],
-      rewards: data[6],
+      duration: data[0] as BigNumber,
+      totalSupply: data[1] as BigNumber,
+      periodFinish: data[2] as BigNumber,
+      rewardRate: data[3] as BigNumber,
+      earned: data[4] as BigNumber,
+      amount: data[5] as BigNumber,
+      rewards: data[6] as BigNumber,
     }),
   });
 
@@ -206,7 +206,6 @@ const StakingForm = () => {
             <RecentStake />
             <DepositWithdraw />
             <OwnerActions address={address} />
-            {/* <p className="text-lg text-left">Contract: {stakingAddress}</p> */}
           </Stack>
         </StakingDataContext.Provider>
       );
