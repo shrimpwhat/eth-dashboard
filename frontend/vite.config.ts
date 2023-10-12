@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       buffer: "buffer/",
+      events: "events",
     },
   },
   plugins: [react()],
