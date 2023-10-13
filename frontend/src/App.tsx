@@ -7,7 +7,6 @@ import TokenPage from "./pages/TokenPage";
 import TokenCreationPage from "./pages/TokenMintPage";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import * as React from "react";
-
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -22,14 +21,13 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
-
 import HomeIcon from "@mui/icons-material/Home";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import TollIcon from "@mui/icons-material/Toll";
 import ImageIcon from "@mui/icons-material/Image";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import "./App.css";
 
 const App = () => {
   const theme = useTheme();
@@ -76,7 +74,11 @@ const App = () => {
       <ToastContainer />
 
       <AppBar open={open}>
-        <Toolbar>
+        <Toolbar
+          sx={{
+            background: "linear-gradient(0.25turn, #6200ea, #9c27b0)",
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -88,7 +90,13 @@ const App = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div">
+          <Typography
+            variant="h6"
+            component="div"
+            fontWeight={700}
+            letterSpacing={0.8}
+            fontSize={22}
+          >
             Web3 Dev Dashboard
           </Typography>
           {!matches && (
@@ -146,7 +154,6 @@ const App = () => {
             ["Home", "/", <HomeIcon color="primary" />],
             ["NFT", "/nft", <ImageIcon color="primary" />],
             ["ERC20", "/token", <TollIcon color="primary" />],
-            ["DEX", "/", <SwapHorizIcon color="primary" />],
           ].map((item, index) => (
             <ListItem key={index}>
               <ListItemButton component={Link} to={item[1] as string}>

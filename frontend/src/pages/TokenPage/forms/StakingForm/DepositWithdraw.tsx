@@ -14,7 +14,7 @@ import { StakingDataContext } from ".";
 const DepositWithdraw = () => {
   const [type, setType] = useState<"deposit" | "withdraw">("deposit");
   const handleType = (
-    event: React.MouseEvent<HTMLElement>,
+    _: React.MouseEvent<HTMLElement>,
     newType: "deposit" | "withdraw" | null
   ) => {
     if (newType !== null) setType(newType);

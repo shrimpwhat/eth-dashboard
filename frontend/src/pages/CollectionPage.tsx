@@ -76,13 +76,13 @@ export default function CollectionPage() {
     ],
     select: (data) => {
       return {
-        name: data[0],
-        price: data[1],
+        name: data[0] as string,
+        price: data[1] as BigNumber,
         userLimit: Number(data[2]),
         totalMinted: Number(data[3]),
         maxSupply: Number(data[4]),
         userMintedAmount: Number(data[5]),
-        owner: data[6],
+        owner: data[6] as string,
       };
     },
   });
@@ -91,7 +91,7 @@ export default function CollectionPage() {
     address: contractAddress,
   });
 
-  const checkAmount = (mintAmount: Number) => {
+  const checkAmount = (mintAmount: number) => {
     if (collectionInfo) {
       if (mintAmount > collectionInfo.maxSupply - collectionInfo.totalMinted)
         throw new Error("Not enough tokens left");

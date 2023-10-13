@@ -1,48 +1,85 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
+import { Card, CardContent, CardMedia, Container, Link } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
+import { deepPurple } from "@mui/material/colors";
 
 const Index = () => {
-  const { isConnected } = useAccount();
+  const links = [
+    {
+      route: "/nft",
+      title: "NFT",
+      description: "Mint your own NFT or a whole collection",
+      icon: (
+        <ImageOutlinedIcon
+          sx={{
+            fontSize: "200px",
+            color: deepPurple[200],
+          }}
+        />
+      ),
+    },
+    {
+      route: "/token",
+      title: "Fungible tokens",
+      description: "Create new ERC20 token",
+      icon: (
+        <MonetizationOnOutlinedIcon
+          sx={{ fontSize: "200px", color: deepPurple[200] }}
+        />
+      ),
+    },
+  ];
+
   return (
     <Box>
-      <Typography variant="h5" textAlign={{ xs: "center", md: "left" }}>
-        Welcome to the Web3 Developer Dashboard! Here you can:
-      </Typography>
-      <List disablePadding>
-        {[
-          "Mint your own NFT or a whole collection",
-          "Setup a staking contract for your collection with rewards in any token",
-          "Create your own ERC-20 token",
-          "Create a farming contract for your token",
-          "Provide a liquidity to your tokens and make them available for swaps",
-        ].map((item, index) => (
-          <ListItem key={index}>
-            <ListItemText
-              primary={"- " + item}
-              primaryTypographyProps={{ variant: "body2" }}
-            />
-          </ListItem>
-        ))}
-      </List>
-      <Box
+      <Container
+        maxWidth="lg"
         sx={{
           display: "flex",
+          mt: 5,
           flexWrap: "wrap",
+          gap: 5,
           justifyContent: "center",
-          maxWidth: "max-content",
-          gap: 3,
         }}
       >
-        <Typography variant="h5" fontWeight={600} textAlign="center">
-          Connect wallet and start creating!
-        </Typography>
-        {!isConnected && <ConnectButton />}
-      </Box>
+        {links.map((item, index) => (
+          <Link
+            component={RouterLink}
+            to={item.route}
+            underline="none"
+            key={index}
+          >
+            <Card
+              sx={{
+                border: "2px solid",
+                borderColor: "primary.main",
+                borderRadius: "10px",
+                p: 1,
+                width: { xs: "300px", md: "400px" },
+                minHeight: "365px",
+              }}
+              className="IndexPage_navigation_card"
+            >
+              <CardMedia sx={{ textAlign: "center" }}>{item.icon}</CardMedia>
+              <CardContent sx={{ pt: 0 }}>
+                <Typography variant="h5" sx={{ mb: 2, color: "primary.main" }}>
+                  {item.title}
+                </Typography>
+                <Typography
+                  fontWeight={500}
+                  textAlign={"center"}
+                  fontSize="1.3rem"
+                >
+                  {item.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </Container>
     </Box>
   );
 };

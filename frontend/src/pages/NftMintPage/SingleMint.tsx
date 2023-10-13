@@ -28,11 +28,11 @@ interface FormProps {
   image: string;
 }
 
-const PINATA_JWT = process.env.REACT_APP_PINATA_JWT_KEY;
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT_KEY;
 const MintSingleNft = () => {
   const { data: signer } = useSigner();
   const contract = useContract({
-    address: process.env.REACT_APP_NFT_MINTER_ADDRESS as string,
+    address: import.meta.env.VITE_NFT_MINTER_ADDRESS as string,
     abi: NftMinterInterface,
     signerOrProvider: signer,
   });
