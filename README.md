@@ -1,4 +1,7 @@
 # Ethereum dashboard
+![1](https://github.com/shrimpwhat/eth-dashboard/assets/49585211/ada586af-b6d6-4754-a6f2-181dcfd9abb5)
+![2](https://github.com/shrimpwhat/eth-dashboard/assets/49585211/91acbccb-26e0-41bf-aa5b-eff7393e5884)
+
 
 Here you can:
 
