@@ -9,19 +9,23 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { configureChains, WagmiConfig, createClient } from "wagmi";
-import { goerli } from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
+import {
+  goerli,
+  polygonMumbai,
+  sepolia,
+  bsc,
+  polygon,
+  arbitrum,
+  optimism,
+} from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { BrowserRouter } from "react-router-dom";
 
 const { chains, provider } = configureChains(
-  [goerli],
-  [
-    alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_KEY as string }),
-    publicProvider(),
-  ]
+  [goerli, polygonMumbai, sepolia, bsc, polygon, arbitrum, optimism],
+  [publicProvider()]
 );
 
 const connectors = connectorsForWallets([

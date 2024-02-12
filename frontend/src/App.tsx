@@ -130,7 +130,7 @@ const App = () => {
           <>
             <DrawerHeader>
               <Box sx={{ mx: "auto" }}>
-                <ConnectButton />
+                <ConnectButton chainStatus="icon" />
               </Box>
               <IconButton
                 onClick={() => {
